@@ -7,9 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Pages\Camera.Razor.js" />
     <Content Include="Pages\Capture.razor.js" />
-    <Content Include="Pages\Webcam.razor.js" />
   </ItemGroup>
 
 

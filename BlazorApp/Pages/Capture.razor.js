@@ -16,14 +16,11 @@ var streaming = false;
 
 var video = null;
 var canvas = null;
-var photo = null;
-var startbutton = null;
 var mirror = true;
 
 export function startup() {
     video = document.getElementById('video');
     canvas = document.getElementById('canvas');
-    photo = document.getElementById('photo');
     startbutton = document.getElementById('startbutton');
 
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
@@ -59,12 +56,6 @@ export function startup() {
         }
     }, false);
 
-    startbutton.addEventListener('click', function (ev) {
-        takepicture();
-        ev.preventDefault();
-    }, false);
-
-    clearphoto();
 }
 
 // Fill the photo with an indication that none has been
@@ -74,9 +65,7 @@ export function clearphoto() {
     var context = canvas.getContext('2d');
     context.fillStyle = "#AAA";
     context.fillRect(0, 0, canvas.width, canvas.height);
-
     var data = canvas.toDataURL('image/png');
-    photo.setAttribute('src', data);
 }
 
 // Capture a photo by fetching the current contents of the video
@@ -91,12 +80,10 @@ export function takepicture() {
         canvas.width = width;
         canvas.height = height;
         context.drawImage(video, 0, 0, width, height);
-
         var data = canvas.toDataURL('image/png');
-        photo.setAttribute('src', data);
-    } else {
-        clearphoto();
+        return data;
     }
+    return "";
 }
 
   // Set up our event listener to run the startup process

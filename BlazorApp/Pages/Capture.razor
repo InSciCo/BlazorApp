@@ -1,48 +1,56 @@
-﻿
-@page "/capture"
+﻿@page "/capture"
 @implements IAsyncDisposable
 @inject IJSRuntime JS
 @inject NavigationManager NavigationManager
 <h3>Camera</h3>
 
 <div class="contentarea">
-	<h1>
-		MDN - WebRTC: Still photo capture demo
-	</h1>
-	<p>
-		This example demonstrates how to set up a media stream using your built-in webcam, fetch an image from that stream, and create a PNG using that image.
-	</p>
-  <div class="camera">
-		<video @ref="_videoReference" id="video">Video stream not available.</video>
-	<button id="startbutton">Take photo</button> 
-  </div>
-  <canvas id="canvas">
-  </canvas>
-  <div class="output">
-	<img id="photo" alt="The screen capture will appear in this box."> 
-  </div>
+    <h1>
+        MDN - WebRTC: Still photo capture demo
+    </h1>
+    <p>
+        This example demonstrates how to set up a media stream using your built-in webcam, fetch an image from that stream, and create a PNG using that image.
+    </p>
+    <div class="camera">
+        <video @ref="_videoReference" id="video">Video stream not available.</video>
+        <button id="startbutton" @onclick="TakePicture">Take photo</button>
+    </div>
+    <canvas id="canvas" />
+    <div class="output">
+        <img src="@imgdata" id="photo" alt="The screen capture will appear in this box.">
+    </div>
 </div>
 
 @code {
-	// https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API/Taking_still_photos
+    // https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API/Taking_still_photos
 
-	private IJSObjectReference? module;
-	private ElementReference? _videoReference;
-	private string? _lastError;
+    private IJSObjectReference? module;
+    private ElementReference? _videoReference;
+    private string? _lastError;
+    private ElementReference? _imgReference;
+    private string? imgdata;
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		if (firstRender)
-		{
-			module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/BlazorApp/Pages/Capture.razor.js");
-			_lastError = module is not null ? await module.InvokeAsync<string?>("startup", _videoReference) : null;
-		}
-		await base.OnAfterRenderAsync(firstRender);
-	}
-	
-	async ValueTask IAsyncDisposable.DisposeAsync()
-	{
-		if (module is not null)
-			await module.DisposeAsync();
-	}
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/BlazorApp/Pages/Capture.razor.js");
+            _lastError = module is not null ? await module.InvokeAsync<string?>("startup", _videoReference) : null;
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task TakePicture()
+    {
+        imgdata = await module!.InvokeAsync<string>("takepicture");
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+            await module.DisposeAsync();
+    }
+
+
+
 }
