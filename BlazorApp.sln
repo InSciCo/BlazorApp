@@ -8,6 +8,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp", "BlazorApp\Blaz
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp.Wasm", "BlazorApp.Wasm\BlazorApp.Wasm.csproj", "{55553FD9-4D03-4EF6-8074-F52A27DE484C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp.ViewModels", "BlazorApp.ViewModels\BlazorApp.ViewModels.csproj", "{D82FB754-E38C-48D3-BCC3-24FD0BFB1BA9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platforms", "Platforms", "{ECA21DBD-899B-4048-8BEB-44A521F865A2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazorise.Camera", "Blazorise.Camera\Blazorise.Camera.csproj", "{BCFCBB89-DB76-48A2-948E-D624CAFBBC00}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BlazoriseExtensions", "BlazoriseExtensions", "{E870F8DC-EA3C-4ECC-A120-D273F19EDD22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,9 +36,22 @@ Global
 		{55553FD9-4D03-4EF6-8074-F52A27DE484C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55553FD9-4D03-4EF6-8074-F52A27DE484C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55553FD9-4D03-4EF6-8074-F52A27DE484C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D82FB754-E38C-48D3-BCC3-24FD0BFB1BA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D82FB754-E38C-48D3-BCC3-24FD0BFB1BA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D82FB754-E38C-48D3-BCC3-24FD0BFB1BA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D82FB754-E38C-48D3-BCC3-24FD0BFB1BA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCFCBB89-DB76-48A2-948E-D624CAFBBC00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCFCBB89-DB76-48A2-948E-D624CAFBBC00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCFCBB89-DB76-48A2-948E-D624CAFBBC00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCFCBB89-DB76-48A2-948E-D624CAFBBC00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{62478DD9-3E2B-44FC-A2D7-66B3238CAFFF} = {ECA21DBD-899B-4048-8BEB-44A521F865A2}
+		{55553FD9-4D03-4EF6-8074-F52A27DE484C} = {ECA21DBD-899B-4048-8BEB-44A521F865A2}
+		{BCFCBB89-DB76-48A2-948E-D624CAFBBC00} = {E870F8DC-EA3C-4ECC-A120-D273F19EDD22}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61F7FB11-1E47-470C-91E2-47F8143E1572}

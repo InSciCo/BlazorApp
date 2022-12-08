@@ -1,30 +1,19 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@namespace BlazorApp
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">MauiBlazorPermissionsExample</a>
+        <a class="navbar-brand" href="">BlazorApp</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
 </div>
 
+
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="location">
-                <span class="oi oi-plus" aria-hidden="true"></span> Location
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="capture">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Capture
-            </NavLink>
-        </div>
-
+        <NavItem Text="Home" Href=""/>
+        <NavItem Text="Location" Href="location" />
+        <NavItem Text="Camera" Href="camera" />
     </nav>
 </div>
 

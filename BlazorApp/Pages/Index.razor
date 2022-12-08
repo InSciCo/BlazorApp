@@ -1,7 +1,51 @@
-﻿@page "/"
+﻿@namespace BlazorApp
+@page "/"
 
-<h1>Hello, world!</h1>
+<Div Margin="Margin.Is4">
+    <h1>BlazorApp</h1>
+    <p>
+        Welcome to BlazorApp. This Visual Studio Solution implements an opinionated base architecture for a fully multi-platform MVVM
+        application using C#, ReactiveUI, Blazorise, .NET7, Blazor and MAUI.
+    </p>
+    <h2>Features:</h2>
+    <ul>
+        <li>Single application code base supports iOS, MacOS, Andriod, Windows, Progress Web App targets.</li>
+        <li>Uses Blazorize UI library.</li>
+        <li>Use Fluent Validation library.</li>
+        <li>Uses ReactiveUI library.</li>
+        <li>Implements Camera and Locaiton permission management.</li>
+        <li>Provides simple, yet complete, examples of various application features.</li>
+    </ul> 
+    <p>The solution is comprised of the following projects:</p>
+    <ul>
+        <li>BlazorApp - this project is a Razor library contianing your application UI.</li>
+        <li>BlazorApp.ViewModels - this project contains MVVM ViewModels for your application logic.</li>
+        <li>BlazorApp.Maui - this project supports deploment to iOS, MacOS, Andriod and Windows targets.</li>
+        <li>BlazorApp.Wasm -  this project supports deployment as a Progressive Web App, Single Page Application.</li>
+    </ul>
+    <h2>Why all the fuss?</h2>
+    <p>
+        Microsoft has kinda knocked the ball out of the park with C#, ReactiveUI,.NET7, Blazor and MAUI technologies.
+        These technologies make it possible to consolidate all your client application development efforts 
+        into one codebase that can run almost anywhere. Add to that a popular open-source UI Components library like Blazorise 
+        and you have a sweet colleciton of very agile tooling to build modern and performant client applications.
+    </p>
+    <p>Benefits:</p>
+    <ul>
+        <li>Reduced investment in codebase - single codebase.</li>
+        <li>Reduced investment in testing - core libraries are tested by Microsoft.</li>
+        <li>Reduced investment in maintenance - core libraries are maintained by Microsoft.</li>
+        <li>Reduced investment in regulatory compliance - core libraries are provided and vetted by Microsoft.</li>
+        <li>Reduced investment in human resources - coders only need know one set of languages and tools.</li>
+        <li>Reduced Intellectual Property risk - libraries used have permissive open-source license - NO GPL.</li>
+        <li>Reduced tooling costs - many fully functional apps can be built without purchasing commercial 3rd party component libraries.</li>
+        <li>Legacy Code Support - JavaScript code can be easily integrated with new code when necessary.</li>
+        <li>Expertise Reuse - Blazor leverages traditional standards like HTML and CSS. Add to that the Blazorise component library's
+            support for Bootstrap and MaterialUI and you have a toolset familliar to most front-end developers.
+        </li>
+    </ul>
+</Div>
+@code {
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+}

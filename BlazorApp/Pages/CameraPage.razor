@@ -1,0 +1,25 @@
+﻿@namespace BlazorApp 
+@page "/camera"
+
+
+<Div Flex="Flex.Column" Margin="Margin.Is3">
+    <h3>CameraPage</h3>
+
+    <Camera @ref="_camera" MirrorImage="true" />
+    <Button Clicked="TakePicture" Color="Color.Primary">Take Picture</Button>
+    
+    <Figure>
+        <FigureImage Source="@imgData">Picture will appear here</FigureImage>
+    </Figure>
+</Div>
+
+@code {
+    private Camera? _camera;
+    private string imgData = string.Empty;
+
+    private async Task TakePicture()
+    {
+        imgData = await _camera!.TakePicture();
+        StateHasChanged();
+    }
+}

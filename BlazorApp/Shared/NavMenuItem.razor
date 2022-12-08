@@ -1,0 +1,16 @@
+﻿@namespace BlazorApp 
+
+@if (Show)
+{
+	<BarItem>
+		<BarLink To="@Href">@Text</BarLink>
+	</BarItem>
+}
+
+@code {
+	[Parameter] public string? Text { get; set; }
+	[Parameter] public string? Href { get; set; }
+	[Parameter] public bool Show { get; set; } = true;
+
+}
+

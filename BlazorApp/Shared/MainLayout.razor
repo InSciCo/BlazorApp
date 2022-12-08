@@ -1,17 +1,28 @@
-﻿@inherits LayoutComponentBase
+﻿@namespace BlazorApp
+@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<Layout>
+	<LayoutHeader Fixed="true" Style="z-index:3;" Background="Background.Primary">
+		<Bar Visible="false">
+			<BarToggler />
+			<BarBrand>
+				BlazorApp
+			</BarBrand>
+			<BarMenu Background="Background.Primary" Padding="Padding.Is2" >
+				<BarStart  >
+					<NavMenuItem Text="Home" Href="" />
+					<NavMenuItem Text="Location" Href="location" />
+					<NavMenuItem Text="Camera" Href="camera" />
+				</BarStart>
+			</BarMenu>
+		</Bar>
+	</LayoutHeader>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+	<LayoutContent>
+		@Body
+	</LayoutContent>
+</Layout>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+@code {
+
+}
