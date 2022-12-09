@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
     <PackageReference Include="Blazorise.Animate" Version="1.1.4.1" />
     <PackageReference Include="Blazorise.Bootstrap5" Version="1.1.4.1" />
     <PackageReference Include="Blazorise.Components" Version="1.1.4.1" />
@@ -24,11 +25,13 @@
     <PackageReference Include="Blazorise.TreeView" Version="1.1.4.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0" />
     <PackageReference Include="ReactiveUI.Blazor" Version="18.4.1" />
+    
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BlazorApp.ViewModels\BlazorApp.ViewModels.csproj" />
     <ProjectReference Include="..\Blazorise.Camera\Blazorise.Camera.csproj" />
+    <ProjectReference Include="..\Blazorise.Canvas\Blazorise.Canvas.csproj" />
   </ItemGroup>
 
 </Project>

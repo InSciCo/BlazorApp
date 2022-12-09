@@ -1,20 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
-	
-  <ItemGroup>
-    <SupportedPlatform Include="browser" />
-  </ItemGroup>
+	<PropertyGroup>
+		<Title>Blazorise Camera</Title>
+		<TargetFramework>net7.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
 
-  <ItemGroup>
-	  <PackageReference Include="Blazorise" Version="1.1.4.1" />
-	  <PackageReference Include="Microsoft.AspNetCore.Components" Version="7.0.0" />
-	  <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />	  
-  </ItemGroup>
+	<ItemGroup>
+		<SupportedPlatform Include="browser" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Blazorise" Version="1.1.4.1" />
+	</ItemGroup>
 
 </Project>
