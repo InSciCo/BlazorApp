@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
 	<PropertyGroup>
 		<Title>Blazorise Camera</Title>
@@ -18,3 +18,4 @@
 	</ItemGroup>
 
 </Project>
+ 
