@@ -1,0 +1,126 @@
+﻿@namespace BlazorApp
+@page "/dragdroptouch3"
+@using System.Linq
+
+<Div Flex="Flex.Column" Width="Width.Is100">
+    <Div Flex="Flex.Row" Width="Width.Is100">
+
+        <Div Flex="Flex.Column" Width="Width.Is25">
+            @foreach (var item in items)
+            {
+                <Button Clicked="@((args) => ItemSelected(args,@item))" draggable="false">
+                    <Figure draggable="false">
+                        <FigureImage Source="@item.Image" draggable="false" />
+                        <FigureCaption>@item.Name</FigureCaption>
+                    </Figure>
+                </Button>
+            }
+        </Div>
+
+        <div style="min-width:1500px; touch-action: none;"
+             @ontouchstart=TouchStart
+
+             @ontouchmove=TouchMove
+
+             @ontouchend=TouchEnd
+             >
+
+        </div>
+    </Div>
+    <p>Start:@startMsg</p>
+    <p>Move:@moveMsg</p>
+    <p>End:@endMsg</p>
+</Div>
+
+
+@code {
+    private bool mouseDown = false;
+
+    public class DropItem
+    {
+        public string Name { get; init; }
+        public string Group { get; set; }
+        public string Image { get; set; }
+        public bool Fruit { get; set; }
+    }
+    public class SelectedItem
+    {
+        public DropItem DropItem { get; set; }
+        public int X { get; set; } = 0;
+        public int Y { get; set; } = 0;
+        public int CursorXOffset { get; set; }
+        public int CursorYOffset { get; set; }
+        public int LastX { get; set; }
+        public int LastY { get; set; }
+        public string Pos => $"position:absolute; top:{Y}px; left:{X}px; width:48px; height:48px;";
+        public ElementReference Element { get; set; }
+    }
+    private List<DropItem> items = new()
+    {
+        new DropItem() { Name = "Apple", Group = "Basket", Image = "_content/BlazorApp/img/apple.png", Fruit = true },
+        new DropItem() { Name = "Bananas", Group = "Basket", Image = "_content/BlazorApp/img/bananas.png", Fruit = true },
+    };
+    private List<SelectedItem> selectedItems = new();
+    private SelectedItem? selectedItem;
+    private int lastTouchProcessed;
+    private int lastTouchPageX;
+    private int lastTouchPageY;
+    private string startMsg = string.Empty;
+    private string moveMsg = string.Empty;
+    private string endMsg = string.Empty;
+
+    private int currentX;
+    private int currentY;
+
+    private Task ItemSelected(MouseEventArgs args, DropItem item)
+    {
+        selectedItems.Add(new SelectedItem()
+            {
+                DropItem = item,
+                X = 150,
+                Y = 150
+            });
+        return Task.CompletedTask;
+    }
+
+    private void TouchStart(TouchEventArgs args)
+    {
+        moveMsg = string.Empty;
+        endMsg = string.Empty;
+        mouseDown = true;
+        lastTouchProcessed = 0;
+        currentX = lastTouchPageX = (int)args.Touches[^1].PageX;
+        currentY = lastTouchPageY = (int)args.Touches[^1].PageY;
+        Console.WriteLine(startMsg = $"TouchStart x:{currentX} y:{currentY}");
+    }
+
+
+    private void TouchMove(TouchEventArgs args)
+    {
+        var movementX = (int)args.ChangedTouches[^1].PageX - lastTouchPageX;
+        lastTouchPageX = (int)args.ChangedTouches[^1].PageX;
+        var movementY = (int)args.ChangedTouches[^1].PageY - lastTouchPageY; ;
+        lastTouchPageY = (int)args.ChangedTouches[^1].PageY;
+
+        currentX += movementX;
+        currentY += movementY;
+        Console.WriteLine(moveMsg = $"TouchMove x:{currentX} y:{currentY} deltaX: {movementX} deltaY:{movementY}");
+    }
+
+    private void TouchEnd(TouchEventArgs args)
+    {
+        if (args.Touches.Length > 0)
+        {
+            var movementX = (args.Touches.Length == 1) ? 0 : (int)args.Touches[^1].PageX - (int)args.Touches[^2].PageX;
+            var movementY = (args.Touches.Length == 1) ? 0 : (int)args.Touches[^1].PageY - (int)args.Touches[^2].PageY;
+
+            currentX += movementX;
+            currentY += movementY;
+            Console.WriteLine(endMsg = $"TouchEnd x:{currentX} y:{currentY} deltaX: {movementX} deltaY:{movementY}");
+        }
+        else Console.WriteLine(endMsg = $"TouchEnd - no movement");
+        mouseDown = false;
+        selectedItem = null;
+
+    }
+}
