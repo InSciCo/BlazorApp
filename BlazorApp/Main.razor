@@ -34,10 +34,10 @@
 
 *@
 @code {
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         // Place any one-time configuration/setup logic here
-        await base.OnInitializedAsync();
+        base.OnInitialized();
     }
 
     private Theme theme = new()

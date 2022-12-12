@@ -1,0 +1,200 @@
+﻿@namespace BlazorApp 
+@page "/dragdroptouch"
+@using System.Linq
+
+<Div Flex="Flex.Row" Width="Width.Is100">
+
+    <Div Flex="Flex.Column" Width="Width.Is25">
+        @foreach (var item in items)
+        {
+            <Button Clicked="@((args) => ItemSelected(args,@item))" draggable="false">
+                <Figure draggable="false">
+                    <FigureImage Source="@item.Image" draggable="false"/>
+                    <FigureCaption>@item.Name</FigureCaption>
+                </Figure>
+            </Button>
+        }
+    </Div>
+
+
+    <div style="min-width:1500px; touch-action: none; "
+            @ontouchmove=TouchMove
+            @ontouchmove:stopPropagation="true"
+            @ontouchmove:preventDefault="true"
+
+            @onmousemove=MouseMove
+            @onmousemove:stopPropagation="true"
+            @onmousemove:preventDefault="true"
+
+            @ondrag=Drag
+            @ondrag:stopPropagation="true"
+            @ondrag:preventDefault="true"
+
+            @ontouchend=TouchEnd
+            @onmouseup=MouseUp
+            @ondragend=DragEnd
+            >
+
+            @foreach(var selectedItem in selectedItems)
+        {
+            <img draggable="true"
+                 src="@selectedItem.DropItem.Image"
+                 style="@selectedItem.Pos"
+                 class="figure-img img-fluid"
+                 @ref="selectedItem.Element"
+                 @onmousedown="@((args) => MouseDown(args,@selectedItem))"
+                 @ontouchstart="@((args) => TouchStart(args, @selectedItem))"
+                 @ondragstart="@((args) => DragStart(args, @selectedItem))" />
+
+        }
+    </div>
+</Div>
+
+
+@code {
+    private bool mouseDown = false;
+
+    public class DropItem
+    {
+        public string Name { get; init; }
+        public string Group { get; set; }
+        public string Image { get; set; }
+        public bool Fruit { get; set; }
+    }
+    public class SelectedItem
+    {
+        public DropItem DropItem { get; set; }
+        public int X { get; set; } = 0;
+        public int Y {get; set;} = 0;
+        public int CursorXOffset { get; set; }
+        public int CursorYOffset { get; set; }
+        public int LastX { get; set; }
+        public int LastY { get; set; }
+        public string Pos => $"position:absolute; top:{Y}px; left:{X}px; width:48px; height:48px;";
+        public ElementReference Element { get; set; }
+    }
+    private List<DropItem> items = new()
+    {
+        new DropItem() { Name = "Apple", Group = "Basket", Image = "_content/BlazorApp/img/apple.png", Fruit = true },
+        new DropItem() { Name = "Bananas", Group = "Basket", Image = "_content/BlazorApp/img/bananas.png", Fruit = true },
+        new DropItem() { Name = "Lemon", Group = "Fruit", Image = "_content/BlazorApp/img/lemon.png", Fruit = true },
+        new DropItem() { Name = "Broccoli", Group = "Basket", Image = "_content/BlazorApp/img/broccoli.png" },
+        new DropItem() { Name = "Strawberry", Group = "Fruit", Image = "_content/BlazorApp/img/strawberry.png", Fruit = true },
+        new DropItem() { Name = "Cherry", Group = "Basket", Image = "_content/BlazorApp/img/cherry.png", Fruit = true },
+        new DropItem() { Name = "Cabbage", Group = "Vegetable", Image = "_content/BlazorApp/img/cabbage.png" },
+    };
+    private List<SelectedItem> selectedItems = new();
+    private SelectedItem? selectedItem;
+    private int xMovement;
+    private int yMovement;
+    private Task ItemSelected(MouseEventArgs args, DropItem item)
+    {
+        selectedItems.Add(new SelectedItem()
+            {
+                DropItem = item,
+                X = 150,
+                Y = 150
+            });
+        return Task.CompletedTask;
+    }
+
+
+    private void TouchStart(TouchEventArgs args, SelectedItem item)
+    {
+        if (mouseDown | selectedItem is not null)
+            return;
+        Console.WriteLine("TouchStart");
+        mouseDown = true;
+        selectedItem = item;
+        item.CursorXOffset = item.X - (int)args.Touches[^1].ClientX;
+        item.CursorYOffset = item.Y - (int)args.Touches[^1].ClientY;
+    }
+
+    private void MouseDown(MouseEventArgs args, SelectedItem item)
+    {
+        if (mouseDown || selectedItem is not null)
+            return;
+        Console.WriteLine("MouseDown");
+        mouseDown = true;
+        selectedItem = item;
+        item.CursorXOffset = item.X - (int)args.ClientX;
+        item.CursorYOffset = item.Y - (int)args.ClientY;
+    }
+
+    private void DragStart(DragEventArgs args, SelectedItem item)
+    {
+        if (mouseDown || selectedItem is not null)
+            return;
+        Console.WriteLine("DragStart");
+        mouseDown = true;
+        selectedItem = item;
+        item.CursorXOffset = item.X - (int)args.ClientX;
+        item.CursorYOffset = item.Y - (int)args.ClientY;
+    }
+
+    private void TouchMove(TouchEventArgs args)
+    {
+        if (!mouseDown || selectedItem is null || args.Touches.Length == 0)
+            return;
+        Console.WriteLine("TouchMove");
+        selectedItem.X = (int)args.Touches[^1].ClientX + selectedItem.CursorXOffset;
+        selectedItem.Y = (int)args.Touches[^1].ClientY + selectedItem.CursorYOffset;
+    }
+
+    private void MouseMove(MouseEventArgs args)
+    {
+        if (!mouseDown || selectedItem is null)
+            return;
+        Console.WriteLine("MouseMove");
+        selectedItem.X = (int)args.ClientX + selectedItem.CursorXOffset;
+        selectedItem.Y = (int)args.ClientY + selectedItem.CursorYOffset;
+    }
+
+    private void Drag(DragEventArgs args)
+    {
+        if (!mouseDown || selectedItem is null)
+            return;
+        Console.WriteLine("Drag");
+        selectedItem.X = (int)args.ClientX + selectedItem.CursorXOffset;
+        selectedItem.Y = (int)args.ClientY + selectedItem.CursorYOffset;
+    }
+
+    private void TouchEnd(TouchEventArgs args)
+    {
+        if (selectedItem is null || !mouseDown)
+            return;
+        Console.WriteLine("TouchEnd");
+        if (args.Touches.Length > 0)
+        {
+            selectedItem.X = (int)args.Touches[^1].ClientX + selectedItem.CursorXOffset;
+            selectedItem.Y = (int)args.Touches[^1].ClientY + selectedItem.CursorYOffset;
+        }
+        mouseDown = false;
+        selectedItem = null;
+
+    }
+
+    private void MouseUp(MouseEventArgs args)
+    {
+        if (selectedItem is null || !mouseDown)
+            return;
+        Console.WriteLine("MouseUp");
+        selectedItem.X = (int)args.ClientX + selectedItem.CursorXOffset;
+        selectedItem.Y = (int)args.ClientY + selectedItem.CursorYOffset;
+        mouseDown = false;
+        selectedItem = null;
+
+    }
+
+    private void DragEnd(DragEventArgs args)
+    {
+        if (selectedItem is null || !mouseDown)
+            return;
+        Console.WriteLine("DragEnd");
+        selectedItem.X = (int)args.ClientX + selectedItem.CursorXOffset;
+        selectedItem.Y = (int)args.ClientY + selectedItem.CursorYOffset;
+        mouseDown = false;
+        selectedItem = null;
+    }
+
+}

@@ -34,4 +34,8 @@
     <ProjectReference Include="..\Blazorise.Canvas\Blazorise.Canvas.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\img\" />
+  </ItemGroup>
+
 </Project>
