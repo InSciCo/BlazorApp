@@ -1,42 +1,39 @@
-﻿@namespace BlazorApp 
+﻿@namespace BlazorApp
 @page "/dragdroptouch2"
 @using System.Linq
 
-<Div Flex="Flex.Row" Width="Width.Is100">
+<Div Flex="Flex.Column" Width="Width.Is100">
+    <Div Flex="Flex.Row" Width="Width.Is100">
 
-    <Div Flex="Flex.Column" Width="Width.Is25">
-        @foreach (var item in items)
-        {
-            <Button Clicked="@((args) => ItemSelected(args,@item))" draggable="false">
-                <Figure draggable="false">
-                    <FigureImage Source="@item.Image" draggable="false"/>
-                    <FigureCaption>@item.Name</FigureCaption>
-                </Figure>
-            </Button>
-        }
-    </Div>
+        <Div Flex="Flex.Column" Width="Width.Is25">
+            @foreach (var item in items)
+            {
+                <Button Clicked="@((args) => ItemSelected(args,@item))" draggable="false">
+                    <Figure draggable="false">
+                        <FigureImage Source="@item.Image" draggable="false" />
+                        <FigureCaption>@item.Name</FigureCaption>
+                    </Figure>
+                </Button>
+            }
+        </Div>
 
-    <div style="min-width:1500px; touch-action: none; "
-            @ontouchmove=TouchMove
-            @ontouchmove:stopPropagation="true"
-            @ontouchmove:preventDefault="true"
+        <div style="min-width:1500px; touch-action: none; "
+             @ontouchmove=TouchMove
+             @ontouchmove:stopPropagation="true"
+             @ontouchmove:preventDefault="true"
+             @onmousemove=MouseMove
+             @onmousemove:stopPropagation="true"
+             @onmousemove:preventDefault="true"
+             @ondrag=Drag
+             @ondrag:stopPropagation="true"
+             @ondrag:preventDefault="true"
+             @ontouchend=TouchEnd
+             @onmouseup=MouseUp
+             @ondragend=DragEnd>
 
-            @onmousemove=MouseMove
-            @onmousemove:stopPropagation="true"
-            @onmousemove:preventDefault="true"
-
-            @ondrag=Drag
-            @ondrag:stopPropagation="true"
-            @ondrag:preventDefault="true"
-
-            @ontouchend=TouchEnd
-            @onmouseup=MouseUp
-            @ondragend=DragEnd
-            >
-
-            @foreach(var selectedItem in selectedItems)
-        {
-            <img draggable="true"
+            @foreach (var selectedItem in selectedItems)
+            {
+                <img draggable="true"
                  src="@selectedItem.DropItem.Image"
                  style="@selectedItem.Pos"
                  class="figure-img img-fluid"
@@ -44,17 +41,19 @@
                  @onmousedown="@((args) => MouseDown(args,@selectedItem))"
                  @onmousedown:stopPropagation="true"
                  @onmousedown:preventDefault="true"
-
                  @ontouchstart="@((args) => TouchStart(args, @selectedItem))"
                  @ontouchstart:stopPropagation="true"
                  @ontouchstart:preventDefault="true"
-
-                 @ondragstart="@((args) => DragStart(args, @selectedItem))" 
+                 @ondragstart="@((args) => DragStart(args, @selectedItem))"
                  @ondragstart:stopPropagation="true"
-                 @ondragstart:preventDefault="true"/>
+                 @ondragstart:preventDefault="true" />
 
-        }
-    </div>
+            }
+        </div>
+    </Div>
+    <p>Start:@startMsg</p>
+    <p>Move:@moveMsg</p>
+    <p>End:@endMsg</p>
 </Div>
 
 
@@ -72,7 +71,7 @@
     {
         public DropItem DropItem { get; set; }
         public int X { get; set; } = 0;
-        public int Y {get; set;} = 0;
+        public int Y { get; set; } = 0;
         public int CursorXOffset { get; set; }
         public int CursorYOffset { get; set; }
         public int LastX { get; set; }
@@ -84,17 +83,16 @@
     {
         new DropItem() { Name = "Apple", Group = "Basket", Image = "_content/BlazorApp/img/apple.png", Fruit = true },
         new DropItem() { Name = "Bananas", Group = "Basket", Image = "_content/BlazorApp/img/bananas.png", Fruit = true },
-        new DropItem() { Name = "Lemon", Group = "Fruit", Image = "_content/BlazorApp/img/lemon.png", Fruit = true },
-        new DropItem() { Name = "Broccoli", Group = "Basket", Image = "_content/BlazorApp/img/broccoli.png" },
-        new DropItem() { Name = "Strawberry", Group = "Fruit", Image = "_content/BlazorApp/img/strawberry.png", Fruit = true },
-        new DropItem() { Name = "Cherry", Group = "Basket", Image = "_content/BlazorApp/img/cherry.png", Fruit = true },
-        new DropItem() { Name = "Cabbage", Group = "Vegetable", Image = "_content/BlazorApp/img/cabbage.png" },
     };
     private List<SelectedItem> selectedItems = new();
     private SelectedItem? selectedItem;
     private int lastTouchProcessed;
     private int lastTouchPageX;
     private int lastTouchPageY;
+    private string startMsg = string.Empty;
+    private string moveMsg = string.Empty;
+    private string endMsg = string.Empty;
+
     private Task ItemSelected(MouseEventArgs args, DropItem item)
     {
         selectedItems.Add(new SelectedItem()
@@ -110,7 +108,9 @@
     {
         if (mouseDown | selectedItem is not null)
             return;
-        Console.WriteLine("TouchStart");
+        Console.WriteLine(startMsg = "TouchStart");
+        moveMsg = string.Empty;
+        endMsg = string.Empty;
         mouseDown = true;
         selectedItem = item;
         lastTouchProcessed = 0;
@@ -125,7 +125,9 @@
     {
         if (mouseDown || selectedItem is not null)
             return;
-        Console.WriteLine("MouseDown");
+        Console.WriteLine(startMsg = "MouseDown");
+        moveMsg = string.Empty;
+        endMsg = string.Empty;
         mouseDown = true;
         selectedItem = item;
         ;
@@ -135,7 +137,9 @@
     {
         if (mouseDown || selectedItem is not null)
             return;
-        Console.WriteLine("DragStart");
+        Console.WriteLine(startMsg = "DragStart");
+        moveMsg = string.Empty;
+        endMsg = string.Empty;
         mouseDown = true;
         selectedItem = item;
     }
@@ -144,14 +148,14 @@
     {
         if (!mouseDown || selectedItem is null || args.ChangedTouches.Length == 0)
             return;
-        var movementX = (int)args.ChangedTouches[^1].PageX - lastTouchPageX ;
+        var movementX = (int)args.ChangedTouches[^1].PageX - lastTouchPageX;
         lastTouchPageX = (int)args.ChangedTouches[^1].PageX;
         var movementY = (int)args.ChangedTouches[^1].PageY - lastTouchPageY; ;
         lastTouchPageY = (int)args.ChangedTouches[^1].PageY;
 
         selectedItem.X += movementX;
         selectedItem.Y += movementY;
-        Console.WriteLine($"TouchMove x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
+        Console.WriteLine(moveMsg = $"TouchMove x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
     }
 
     private void MouseMove(MouseEventArgs args)
@@ -162,7 +166,7 @@
         selectedItem.X += movementX;
         var movementY = (int)args.MovementY;
         selectedItem.Y += movementY;
-        Console.WriteLine($"MouseMove x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
+        Console.WriteLine(moveMsg = $"MouseMove x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
     }
 
     private void Drag(DragEventArgs args)
@@ -173,7 +177,7 @@
         selectedItem.X += movementX;
         var movementY = (int)args.MovementY;
         selectedItem.Y += movementY;
-        Console.WriteLine($"Drag x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
+        Console.WriteLine(moveMsg = $"Drag x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
     }
 
     private void TouchEnd(TouchEventArgs args)
@@ -187,9 +191,9 @@
 
             selectedItem.X += movementX;
             selectedItem.Y += movementY;
-            Console.WriteLine($"TouchEnd x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
+            Console.WriteLine(endMsg = $"TouchEnd x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
         }
-        else Console.WriteLine($"TouchEnd - no movement");
+        else Console.WriteLine(endMsg = $"TouchEnd - no movement");
         mouseDown = false;
         selectedItem = null;
 
@@ -204,7 +208,7 @@
         selectedItem.X += movementX;
         var movementY = (int)args.MovementY;
         selectedItem.Y += movementY;
-        Console.WriteLine($"MouseUp x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
+        Console.WriteLine(endMsg = $"MouseUp x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
         mouseDown = false;
         selectedItem = null;
 
@@ -219,7 +223,7 @@
         selectedItem.X += movementX;
         var movementY = (int)args.MovementY;
         selectedItem.Y += movementY;
-        Console.WriteLine($"DragEnd x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
+        Console.WriteLine(endMsg = $"DragEnd x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
         mouseDown = false;
         selectedItem = null;
     }
