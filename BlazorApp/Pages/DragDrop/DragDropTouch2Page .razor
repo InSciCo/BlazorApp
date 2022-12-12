@@ -92,8 +92,9 @@
     };
     private List<SelectedItem> selectedItems = new();
     private SelectedItem? selectedItem;
-    private int xMovement;
-    private int yMovement;
+    private int lastTouchProcessed;
+    private int lastTouchPageX;
+    private int lastTouchPageY;
     private Task ItemSelected(MouseEventArgs args, DropItem item)
     {
         selectedItems.Add(new SelectedItem()
@@ -112,8 +113,12 @@
         Console.WriteLine("TouchStart");
         mouseDown = true;
         selectedItem = item;
-        item.CursorXOffset = item.X - (int)args.Touches[^1].ClientX;
-        item.CursorYOffset = item.Y - (int)args.Touches[^1].ClientY;
+        lastTouchProcessed = 0;
+        lastTouchPageX = (int)args.Touches[^1].PageX;
+        lastTouchPageY = (int)args.Touches[^1].PageY;
+
+        //item.CursorXOffset = item.X - (int)args.Touches[^1].ClientX;
+        //item.CursorYOffset = item.Y - (int)args.Touches[^1].ClientY;
     }
 
     private void MouseDown(MouseEventArgs args, SelectedItem item)
@@ -137,41 +142,54 @@
 
     private void TouchMove(TouchEventArgs args)
     {
-        if (!mouseDown || selectedItem is null || args.Touches.Length == 0)
+        if (!mouseDown || selectedItem is null || args.ChangedTouches.Length == 0)
             return;
-        Console.WriteLine("TouchMove");
-        selectedItem.X = (int)args.Touches[^1].ClientX + selectedItem.CursorXOffset;
-        selectedItem.Y = (int)args.Touches[^1].ClientY + selectedItem.CursorYOffset;
+        var movementX = (int)args.ChangedTouches[^1].PageX - lastTouchPageX ;
+        lastTouchPageX = (int)args.ChangedTouches[^1].PageX;
+        var movementY = (int)args.ChangedTouches[^1].PageY - lastTouchPageY; ;
+        lastTouchPageY = (int)args.ChangedTouches[^1].PageY;
+
+        selectedItem.X += movementX;
+        selectedItem.Y += movementY;
+        Console.WriteLine($"TouchMove x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
     }
 
     private void MouseMove(MouseEventArgs args)
     {
         if (!mouseDown || selectedItem is null)
             return;
-        Console.WriteLine("MouseMove");
-        selectedItem.X += (int)args.MovementX;
-        selectedItem.Y += (int)args.MovementY;
+        var movementX = (int)args.MovementX;
+        selectedItem.X += movementX;
+        var movementY = (int)args.MovementY;
+        selectedItem.Y += movementY;
+        Console.WriteLine($"MouseMove x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
     }
 
     private void Drag(DragEventArgs args)
     {
         if (!mouseDown || selectedItem is null)
             return;
-        Console.WriteLine("Drag");
-        selectedItem.X += (int)args.MovementX;
-        selectedItem.Y += (int)args.MovementY;
+        var movementX = (int)args.MovementX;
+        selectedItem.X += movementX;
+        var movementY = (int)args.MovementY;
+        selectedItem.Y += movementY;
+        Console.WriteLine($"Drag x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
     }
 
     private void TouchEnd(TouchEventArgs args)
     {
         if (selectedItem is null || !mouseDown)
             return;
-        Console.WriteLine("TouchEnd");
         if (args.Touches.Length > 0)
         {
-            selectedItem.X = xMovement + selectedItem.CursorXOffset;
-            selectedItem.Y = yMovement + selectedItem.CursorYOffset;
+            var movementX = (args.Touches.Length == 1) ? 0 : (int)args.Touches[^1].PageX - (int)args.Touches[^2].PageX;
+            var movementY = (args.Touches.Length == 1) ? 0 : (int)args.Touches[^1].PageY - (int)args.Touches[^2].PageY;
+
+            selectedItem.X += movementX;
+            selectedItem.Y += movementY;
+            Console.WriteLine($"TouchEnd x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
         }
+        else Console.WriteLine($"TouchEnd - no movement");
         mouseDown = false;
         selectedItem = null;
 
@@ -182,10 +200,14 @@
         if (selectedItem is null || !mouseDown)
             return;
         Console.WriteLine("MouseUp");
-        selectedItem.X += (int)args.MovementX;
-        selectedItem.Y += (int)args.MovementY;
+        var movementX = (int)args.MovementX;
+        selectedItem.X += movementX;
+        var movementY = (int)args.MovementY;
+        selectedItem.Y += movementY;
+        Console.WriteLine($"MouseUp x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
         mouseDown = false;
         selectedItem = null;
+
     }
 
     private void DragEnd(DragEventArgs args)
@@ -193,8 +215,11 @@
         if (selectedItem is null || !mouseDown)
             return;
         Console.WriteLine("DragEnd");
-        selectedItem.X += (int)args.MovementX;
-        selectedItem.Y += (int)args.MovementY;
+        var movementX = (int)args.MovementX;
+        selectedItem.X += movementX;
+        var movementY = (int)args.MovementY;
+        selectedItem.Y += movementY;
+        Console.WriteLine($"DragEnd x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
         mouseDown = false;
         selectedItem = null;
     }
