@@ -23,9 +23,7 @@
              @onpointermove=PointerMove
              @onpointermove:stopPropagation="true"
              @onpointermove:preventDefault="true"
-             @onpointerup=PointerUp
-             @ongotpointercapture=CanvasGotPointerCapture
-             @onlostpointercapture=CanvasLostPointerCapture>
+             @onpointerup=PointerUp>
 
             @foreach (var selectedItem in selectedItems)
             {
@@ -34,8 +32,6 @@
                  style="@selectedItem.Pos"
                  class="figure-img img-fluid"
                  @ref="selectedItem.Element"
-                 @ongotpointercapture=ItemGotPointerCapture
-                 @onlostpointercapture=ItemLostPointerCapture
                  @onpointerdown="@((args) => PointerDown(args,@selectedItem))"
                  @onpointerdown:stopPropagation="true"
                  @onpointerdown:preventDefault="true"/>
@@ -83,8 +79,8 @@
     private int lastTouchProcessed;
     private int lastTouchPageX;
     private int lastTouchPageY;
-    private bool canvasHasPointerCapture;
-    private bool itemHasPointerCapture;
+    private Boolean canvasHasPointerCapture;
+    private Boolean itemHasPointerCapture;
     private string startMsg = string.Empty;
     private string moveMsg = string.Empty;
     private string endMsg = string.Empty;
@@ -100,12 +96,6 @@
         return Task.CompletedTask;
     }
 
-    private void CanvasGotPointerCapture() => canvasHasPointerCapture = true;
-    private void CanvasLostPointerCapture() => canvasHasPointerCapture = false;
-    private void ItemGotPointerCapture() => itemHasPointerCapture = true;
-    private void ItemLostPointerCapture() => itemHasPointerCapture = false;
-
-
     private async void PointerDown(PointerEventArgs args, SelectedItem item)
     {
         if (pointerDown || selectedItem is not null)
@@ -115,11 +105,15 @@
         endMsg = string.Empty;
         pointerDown = true;
         selectedItem = item;
-        await JSRuntime.InvokeVoidAsync("setPointerCapture",canvas, args.PointerId);
+
+        //await JSRuntime.InvokeVoidAsync("releasePointerCapture", canvas, args.PointerId);
+        //await JSRuntime.InvokeVoidAsync("setPointerCapture", canvas, args.PointerId);
+        canvasHasPointerCapture = await JSRuntime.InvokeAsync<Boolean>("hasPointerCapture", canvas, args.PointerId);
+        itemHasPointerCapture = await JSRuntime.InvokeAsync<Boolean>("hasPointerCapture", item.Element, args.PointerId);
         ;
     }
 
-    private void PointerMove(PointerEventArgs args)
+    private async void PointerMove(PointerEventArgs args)
     {
         if (!pointerDown || selectedItem is null)
             return;
@@ -127,11 +121,15 @@
         selectedItem.X += movementX;
         var movementY = (int)args.MovementY;
         selectedItem.Y += movementY;
+
+        canvasHasPointerCapture = await JSRuntime.InvokeAsync<Boolean>("hasPointerCapture", canvas, args.PointerId);
+        itemHasPointerCapture = await JSRuntime.InvokeAsync<Boolean>("hasPointerCapture", selectedItem.Element, args.PointerId);
+
         Console.WriteLine(moveMsg = $"PointerMove x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
     }
 
 
-    private void PointerUp(PointerEventArgs args)
+    private async void PointerUp(PointerEventArgs args)
     {
         if (selectedItem is null || !pointerDown)
             return;
@@ -140,6 +138,10 @@
         selectedItem.X += movementX;
         var movementY = (int)args.MovementY;
         selectedItem.Y += movementY;
+
+        canvasHasPointerCapture = await JSRuntime.InvokeAsync<Boolean>("hasPointerCapture", canvas, args.PointerId);
+        itemHasPointerCapture = await JSRuntime.InvokeAsync<Boolean>("hasPointerCapture", selectedItem.Element, args.PointerId);
+
         Console.WriteLine(endMsg = $"PointerUp x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
         pointerDown = false;
         selectedItem = null;

@@ -61,7 +61,15 @@
         window.setPointerCapture = (element, pointerId) => {
             element.setPointerCapture(pointerId);
         };
+
+        window.releasePointerCapture = (element, pointerId) => {
+            element.releasePointerCapture(pointerId);
+        }
+        window.hasPointerCapture = (element, pointerId) => {
+            return element.hasPointerCapture(pointerId);
+        }
     </script>
+
 
     <script src="_content/BlazorApp/js/location.js"></script>
 

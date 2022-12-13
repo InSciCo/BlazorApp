@@ -69,6 +69,13 @@
         window.setPointerCapture = (element, pointerId) => {
             element.setPointerCapture(pointerId);
         };
+
+        window.releasePointerCapture = (element, pointerId) => {
+            element.releasePointerCapture(pointerId);
+        }
+        window.hasPointerCapture = (element, pointerId) => {
+            return element.hasPointerCapture(pointerId);
+        }
     </script>
 
     <script>navigator.serviceWorker.register('service-worker.js');</script>
