@@ -106,8 +106,8 @@
         pointerDown = true;
         selectedItem = item;
 
-        //await JSRuntime.InvokeVoidAsync("releasePointerCapture", canvas, args.PointerId);
-        //await JSRuntime.InvokeVoidAsync("setPointerCapture", canvas, args.PointerId);
+        await JSRuntime.InvokeVoidAsync("releasePointerCapture", item.Element, args.PointerId);
+        await JSRuntime.InvokeVoidAsync("setPointerCapture", canvas, args.PointerId);
         canvasHasPointerCapture = await JSRuntime.InvokeAsync<Boolean>("hasPointerCapture", canvas, args.PointerId);
         itemHasPointerCapture = await JSRuntime.InvokeAsync<Boolean>("hasPointerCapture", item.Element, args.PointerId);
         ;
