@@ -23,7 +23,9 @@
              @onpointermove=PointerMove
              @onpointermove:stopPropagation="true"
              @onpointermove:preventDefault="true"
-             @onpointerup=PointerUp>
+             @onpointerup=PointerUp
+             @ongotpointercapture=CanvasGotPointerCapture
+             @onlostpointercapture=CanvasLostPointerCapture>
 
             @foreach (var selectedItem in selectedItems)
             {
@@ -32,12 +34,16 @@
                  style="@selectedItem.Pos"
                  class="figure-img img-fluid"
                  @ref="selectedItem.Element"
+                 @ongotpointercapture=ItemGotPointerCapture
+                 @onlostpointercapture=ItemLostPointerCapture
                  @onpointerdown="@((args) => PointerDown(args,@selectedItem))"
                  @onpointerdown:stopPropagation="true"
                  @onpointerdown:preventDefault="true"/>
             }
         </div>
     </Div>
+    <p>CanvasPointerCapture: @canvasHasPointerCapture </p>
+    <p>ItemPointerCapture: @itemHasPointerCapture</p>
     <p>Start:@startMsg</p>
     <p>Move:@moveMsg</p>
     <p>End:@endMsg</p>
@@ -77,6 +83,8 @@
     private int lastTouchProcessed;
     private int lastTouchPageX;
     private int lastTouchPageY;
+    private bool canvasHasPointerCapture;
+    private bool itemHasPointerCapture;
     private string startMsg = string.Empty;
     private string moveMsg = string.Empty;
     private string endMsg = string.Empty;
@@ -91,6 +99,12 @@
             });
         return Task.CompletedTask;
     }
+
+    private void CanvasGotPointerCapture() => canvasHasPointerCapture = true;
+    private void CanvasLostPointerCapture() => canvasHasPointerCapture = false;
+    private void ItemGotPointerCapture() => itemHasPointerCapture = true;
+    private void ItemLostPointerCapture() => itemHasPointerCapture = false;
+
 
     private async void PointerDown(PointerEventArgs args, SelectedItem item)
     {
