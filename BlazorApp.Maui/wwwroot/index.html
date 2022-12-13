@@ -57,7 +57,11 @@
 
     <script src="_framework/blazor.webview.js" autostart="false"></script>
 
-    <script src="_conrent/BlazorApp/exampleJsInterop.js"></script>
+    <script>
+        window.setPointerCapture = (element, pointerId) => {
+            element.setPointerCapture(pointerId);
+        };
+    </script>
 
     <script src="_content/BlazorApp/js/location.js"></script>
 
