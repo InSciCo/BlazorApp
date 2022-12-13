@@ -35,7 +35,8 @@
                  @ref="selectedItem.Element"
                  @onpointerdown="@((args) => PointerDown(args,@selectedItem))"
                  @onpointerdown:stopPropagation="true"
-                 @onpointerdown:preventDefault="true"/>
+                 @onpointerdown:preventDefault="true"
+                 @ontouchmove:preventDefault="true"/>
             }
         </div>
     </Div>
