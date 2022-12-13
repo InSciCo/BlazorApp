@@ -65,7 +65,11 @@
 
     <script src="_framework/blazor.webassembly.js"></script>
 
-    <script src="_conrent/BlazorApp/exampleJsInterop.js"></script>
+    <script>
+        window.setPointerCapture = (element, pointerId) => {
+            element.setPointerCapture(pointerId);
+        };
+    </script>
 
     <script>navigator.serviceWorker.register('service-worker.js');</script>
 

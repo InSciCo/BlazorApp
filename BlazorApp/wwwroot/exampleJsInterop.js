@@ -7,5 +7,6 @@ export function showPrompt(message) {
 
 
 export function setPointerCapture(element) {
+    console.log("setPointerCature called");
     element.setPointerCapture();
 }

@@ -92,7 +92,7 @@
         return Task.CompletedTask;
     }
 
-    private void PointerDown(PointerEventArgs args, SelectedItem item)
+    private async void PointerDown(PointerEventArgs args, SelectedItem item)
     {
         if (pointerDown || selectedItem is not null)
             return;
@@ -101,7 +101,7 @@
         endMsg = string.Empty;
         pointerDown = true;
         selectedItem = item;
-        JSRuntime.InvokeVoidAsync("setPointerCapture",canvas);
+        await JSRuntime.InvokeVoidAsync("setPointerCapture",canvas, args.PointerId);
         ;
     }
 
