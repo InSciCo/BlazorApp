@@ -1,11 +1,12 @@
 ﻿@namespace BlazorApp
-@page "/dragdroptouch3"
+@page "/dragdroptouch4"
 @using System.Linq
+@inject IJSRuntime JSRuntime
 
 <Div Flex="Flex.Column" Width="Width.Is100">
     <Div Flex="Flex.Row" Width="Width.Is100">
 
-        <Div Flex="Flex.Column" Width="Width.Is25">
+        <Div Flex="Flex.Column" Width="Width.Is25"> 
             @foreach (var item in items)
             {
                 <Button Clicked="@((args) => ItemSelected(args,@item))" draggable="false">
@@ -17,20 +18,24 @@
             }
         </Div>
 
-        <div style="min-width:1500px; touch-action: none;"
-             @ontouchstart=TouchStart
-             @ontouchstart:preventDefault="true"
-             @ontouchstart:stopPropagation="true"
+        <div @ref="canvas" 
+            style="min-width:1500px; touch-action: none; "
+             @onpointermove=PointerMove
+             @onpointermove:stopPropagation="true"
+             @onpointermove:preventDefault="true"
+             @onpointerup=PointerUp>
 
-             @ontouchmove=TouchMove
-             @ontouchmove:preventDefault="true"
-             @ontouchmove:stopPropagation="true"
-
-             @ontouchend=TouchEnd
-             @ontouchend:preventDefault="true"
-             @ontouchend:stopPropagation="true"
-             >
-
+            @foreach (var selectedItem in selectedItems)
+            {
+                <img draggable="true"
+                 src="@selectedItem.DropItem.Image"
+                 style="@selectedItem.Pos"
+                 class="figure-img img-fluid"
+                 @ref="selectedItem.Element"
+                 @onpointerdown="@((args) => PointerDown(args,@selectedItem))"
+                 @onpointerdown:stopPropagation="true"
+                 @onpointerdown:preventDefault="true"/>
+            }
         </div>
     </Div>
     <p>Start:@startMsg</p>
@@ -40,7 +45,8 @@
 
 
 @code {
-    private bool mouseDown = false;
+    private bool pointerDown = false;
+    private ElementReference canvas;
 
     public class DropItem
     {
@@ -75,9 +81,6 @@
     private string moveMsg = string.Empty;
     private string endMsg = string.Empty;
 
-    private int currentX;
-    private int currentY;
-
     private Task ItemSelected(MouseEventArgs args, DropItem item)
     {
         selectedItems.Add(new SelectedItem()
@@ -89,44 +92,44 @@
         return Task.CompletedTask;
     }
 
-    private void TouchStart(TouchEventArgs args)
+    private void PointerDown(PointerEventArgs args, SelectedItem item)
     {
+        if (pointerDown || selectedItem is not null)
+            return;
+        Console.WriteLine(startMsg = "PointerDown");
         moveMsg = string.Empty;
         endMsg = string.Empty;
-        mouseDown = true;
-        lastTouchProcessed = 0;
-        currentX = lastTouchPageX = (int)args.Touches[^1].PageX;
-        currentY = lastTouchPageY = (int)args.Touches[^1].PageY;
-        Console.WriteLine(startMsg = $"TouchStart x:{currentX} y:{currentY}");
+        pointerDown = true;
+        selectedItem = item;
+        JSRuntime.InvokeVoidAsync("setPointerCapture",canvas);
+        ;
+    }
+
+    private void PointerMove(PointerEventArgs args)
+    {
+        if (!pointerDown || selectedItem is null)
+            return;
+        var movementX = (int)args.MovementX;
+        selectedItem.X += movementX;
+        var movementY = (int)args.MovementY;
+        selectedItem.Y += movementY;
+        Console.WriteLine(moveMsg = $"PointerMove x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
     }
 
 
-    private void TouchMove(TouchEventArgs args)
+    private void PointerUp(PointerEventArgs args)
     {
-        var movementX = (int)args.ChangedTouches[^1].PageX - lastTouchPageX;
-        lastTouchPageX = (int)args.ChangedTouches[^1].PageX;
-        var movementY = (int)args.ChangedTouches[^1].PageY - lastTouchPageY; ;
-        lastTouchPageY = (int)args.ChangedTouches[^1].PageY;
-
-        currentX += movementX;
-        currentY += movementY;
-        Console.WriteLine(moveMsg = $"TouchMove x:{currentX} y:{currentY} deltaX: {movementX} deltaY:{movementY}");
-    }
-
-    private void TouchEnd(TouchEventArgs args)
-    {
-        if (args.Touches.Length > 0)
-        {
-            var movementX = (args.Touches.Length == 1) ? 0 : (int)args.Touches[^1].PageX - (int)args.Touches[^2].PageX;
-            var movementY = (args.Touches.Length == 1) ? 0 : (int)args.Touches[^1].PageY - (int)args.Touches[^2].PageY;
-
-            currentX += movementX;
-            currentY += movementY;
-            Console.WriteLine(endMsg = $"TouchEnd x:{currentX} y:{currentY} deltaX: {movementX} deltaY:{movementY}");
-        }
-        else Console.WriteLine(endMsg = $"TouchEnd - no movement");
-        mouseDown = false;
+        if (selectedItem is null || !pointerDown)
+            return;
+        Console.WriteLine("PointerUp");
+        var movementX = (int)args.MovementX;
+        selectedItem.X += movementX;
+        var movementY = (int)args.MovementY;
+        selectedItem.Y += movementY;
+        Console.WriteLine(endMsg = $"PointerUp x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
+        pointerDown = false;
         selectedItem = null;
 
     }
+
 }
