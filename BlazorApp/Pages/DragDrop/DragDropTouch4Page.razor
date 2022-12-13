@@ -23,7 +23,8 @@
              @onpointermove=PointerMove
              @onpointermove:stopPropagation="true"
              @onpointermove:preventDefault="true"
-             @onpointerup=PointerUp>
+             @onpointerup=PointerUp
+             @ontouchmove:preventDefault="true">
 
             @foreach (var selectedItem in selectedItems)
             {
