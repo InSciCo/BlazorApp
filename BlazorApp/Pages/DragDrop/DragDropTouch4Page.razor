@@ -20,31 +20,38 @@
 
         <div @ref="canvas" 
             style="min-width:1500px; touch-action: none; "
-             @onpointermove=PointerMove
-             @onpointermove:stopPropagation="true"
-             @onpointermove:preventDefault="true"
-             @onpointerup=PointerUp
-             @ontouchmove:preventDefault="true">
+             >
 
             @foreach (var selectedItem in selectedItems)
             {
-                <img
-                 src="@selectedItem.DropItem.Image"
-                 style="@selectedItem.Pos"
-                 class="figure-img img-fluid"
-                 @ref="selectedItem.Element"
-                 @onpointerdown="@((args) => PointerDown(args,@selectedItem))"
-                 @onpointerdown:stopPropagation="true"
-                 @onpointerdown:preventDefault="true"
-                 @ontouchmove:preventDefault="true"/>
+                <div
+                    @onclick:preventDefault="true"
+                    draggable="false"
+                    @ref="selectedItem.Element"
+                    @onpointerdown="@((args) => PointerDown(args,@selectedItem))"
+                    @onpointermove="@((args) => PointerMove(args, @selectedItem))"
+                    @onpointerup="@((args)=>PointerUp(args, @selectedItem))"
+
+                    style="@selectedItem.Pos"
+                    >
+                    @*Note: The style assigned to the img prevents a serious bug in Blazor on iOS/Catalyst. Essentually, iOS trys to run some image processing 
+                        on the img when it is clicked and a bug in that process causes the onpointermove to not fire. This style also addresses a "bug" in Andriod 
+                        where the moveevents are doubled (causing the pointer to race ahead of the image movement). 
+                    *@
+                    <img
+                        draggable="false"
+                        src="@selectedItem.DropItem.Image"
+                        class="figure-img img-fluid"
+                        style="-webkit-touch-callout: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;" />
+                </div>
             }
         </div>
     </Div>
-    <p>CanvasPointerCapture: @canvasHasPointerCapture </p>
     <p>ItemPointerCapture: @itemHasPointerCapture</p>
     <p>Start:@startMsg</p>
     <p>Move:@moveMsg</p>
     <p>End:@endMsg</p>
+    <p>ItemPointerId: @itemPointerId</p>
 </Div>
 
 
@@ -68,7 +75,7 @@
         public int CursorYOffset { get; set; }
         public int LastX { get; set; }
         public int LastY { get; set; }
-        public string Pos => $"position:absolute; top:{Y}px; left:{X}px; width:48px; height:48px;";
+        public string Pos => $"position:absolute; top:{Y}px; left:{X}px; width:48px; height:48px; z-index:10;";
         public ElementReference Element { get; set; }
     }
     private List<DropItem> items = new()
@@ -79,13 +86,13 @@
     private List<SelectedItem> selectedItems = new();
     private SelectedItem? selectedItem;
     private int lastTouchProcessed;
-    private int lastTouchPageX;
-    private int lastTouchPageY;
-    private Boolean canvasHasPointerCapture;
+    private int pageX;
+    private int pageY;
     private Boolean itemHasPointerCapture;
     private string startMsg = string.Empty;
     private string moveMsg = string.Empty;
     private string endMsg = string.Empty;
+    private long itemPointerId;
 
     private Task ItemSelected(MouseEventArgs args, DropItem item)
     {
@@ -100,49 +107,70 @@
 
     private async void PointerDown(PointerEventArgs args, SelectedItem item)
     {
-        if (pointerDown || selectedItem is not null)
+        itemPointerId = args.PointerId;
+
+        if (pointerDown || item is null)
+        {
+            //Console.WriteLine("Pointerdown - item is null");
             return;
-        Console.WriteLine(startMsg = "PointerDown");
+        }
+        pageX = (int)args.PageX;
+        pageY = (int)args.PageY;
+
+        Console.WriteLine(startMsg = $"PointerDown x:{(int)args.ClientX} y:{(int)args.ClientY} xPage:{(int)args.PageX} yPage:{(int)args.PageY} xOffset:{(int)args.OffsetX} yOffset:{(int)args.OffsetY}");
         moveMsg = string.Empty;
         endMsg = string.Empty;
         pointerDown = true;
         selectedItem = item;
 
-        await JSRuntime.InvokeVoidAsync("releasePointerCapture", item.Element, args.PointerId);
-        await JSRuntime.InvokeVoidAsync("setPointerCapture", canvas, args.PointerId);
-        canvasHasPointerCapture = await JSRuntime.InvokeAsync<Boolean>("hasPointerCapture", canvas, args.PointerId);
+        await JSRuntime.InvokeVoidAsync("setPointerCapture", item.Element, args.PointerId);
         itemHasPointerCapture = await JSRuntime.InvokeAsync<Boolean>("hasPointerCapture", item.Element, args.PointerId);
         ;
     }
 
-    private async void PointerMove(PointerEventArgs args)
+    private async void PointerMove(PointerEventArgs args, SelectedItem item)
     {
-        if (!pointerDown || selectedItem is null)
+        if (!pointerDown)
+        {
+            Console.WriteLine($"PointerMove - !pointerDown");
             return;
-        var movementX = (int)args.MovementX;
+        }
+
+        if (selectedItem is null || selectedItem != item)
+        {
+            Console.WriteLine($"PointerMove - no selectedItem");
+            return;
+        }
+
+        var movementX = (int)args.PageX - pageX;
+        pageX = (int)args.PageX;
         selectedItem.X += movementX;
-        var movementY = (int)args.MovementY;
+        var movementY = (int)args.PageY - pageY;
+        pageY = (int)args.PageY;
         selectedItem.Y += movementY;
 
-        canvasHasPointerCapture = await JSRuntime.InvokeAsync<Boolean>("hasPointerCapture", canvas, args.PointerId);
         itemHasPointerCapture = await JSRuntime.InvokeAsync<Boolean>("hasPointerCapture", selectedItem.Element, args.PointerId);
 
-        Console.WriteLine(moveMsg = $"PointerMove x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
+        Console.WriteLine(moveMsg = $"PointerMove x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}  pageX:{args.PageX} pageY:{args.PageY}");
     }
 
 
-    private async void PointerUp(PointerEventArgs args)
+    private async void PointerUp(PointerEventArgs args, SelectedItem item)
     {
-        if (selectedItem is null || !pointerDown)
+        if (selectedItem is null || selectedItem != item || !pointerDown)
             return;
         Console.WriteLine("PointerUp");
-        var movementX = (int)args.MovementX;
+        var movementX = (int)args.PageX - pageX;
+        pageX = (int)args.PageX;
         selectedItem.X += movementX;
-        var movementY = (int)args.MovementY;
+        var movementY = (int)args.PageY - pageY;
+        pageY = (int)args.PageY;
         selectedItem.Y += movementY;
 
-        canvasHasPointerCapture = await JSRuntime.InvokeAsync<Boolean>("hasPointerCapture", canvas, args.PointerId);
         itemHasPointerCapture = await JSRuntime.InvokeAsync<Boolean>("hasPointerCapture", selectedItem.Element, args.PointerId);
+        if(itemHasPointerCapture)
+            await JSRuntime.InvokeVoidAsync("releasePointerCapture", selectedItem.Element, args.PointerId);
+        itemHasPointerCapture = false;
 
         Console.WriteLine(endMsg = $"PointerUp x:{selectedItem.X} y:{selectedItem.Y} deltaX: {movementX} deltaY:{movementY}");
         pointerDown = false;
