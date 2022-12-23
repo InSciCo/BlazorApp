@@ -1,4 +1,6 @@
-﻿// For reference, See https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API/Taking_still_photos
+﻿// For reference, See:
+// https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API/Taking_still_photos
+// https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
 
 // |streaming| indicates whether or not we're currently streaming
 // video from the camera. Obviously, we start at false.
@@ -9,12 +11,20 @@ var streaming = false;
 var video = null;
 var canvas = null;
 
-export function initialize(element, canvasElement, mirrorImage) {
-    video = element;
-    canvas = canvasElement;
+export function initialize(videoRef, canvasRef, mirrorImage, facingMode) {
+    video = videoRef;
+    canvas = canvasRef;
+    facingMode = (facingMode == null || facingMode == "") ? "environment" : facingMode;
     //mirror = mirrorImage;
 
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    navigator.mediaDevices.getUserMedia( // request media input and returns a media stream
+        { // Pass in constraints for requested media input
+            video:
+            { 
+                facingMode: facingMode // one of "user" or "environment"
+            },
+            audio: false
+        })
         .then(function (stream) {
             video.srcObject = stream;
             video.play();

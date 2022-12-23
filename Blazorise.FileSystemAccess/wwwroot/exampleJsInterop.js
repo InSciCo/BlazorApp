@@ -4,9 +4,3 @@
 export function showPrompt(message) {
   return prompt(message, 'Type anything here');
 }
-
-
-export function setPointerCapture(element) {
-    console.log("setPointerCature called");
-    element.setPointerCapture();
-}

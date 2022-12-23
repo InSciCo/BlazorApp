@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazorise.Canvas", "Blazori
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazorise.Canvas.JS", "Blazorise.Canvas.JS\Blazorise.Canvas.JS.csproj", "{100638BE-06BD-48CD-8614-08483C638A2F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazorise.AnnotatedImage", "Blazorise.AnnotatedImage\Blazorise.AnnotatedImage.csproj", "{0DD6534B-042D-43F3-BB21-AF36CBD7CD67}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{100638BE-06BD-48CD-8614-08483C638A2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{100638BE-06BD-48CD-8614-08483C638A2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{100638BE-06BD-48CD-8614-08483C638A2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DD6534B-042D-43F3-BB21-AF36CBD7CD67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DD6534B-042D-43F3-BB21-AF36CBD7CD67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DD6534B-042D-43F3-BB21-AF36CBD7CD67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DD6534B-042D-43F3-BB21-AF36CBD7CD67}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +72,7 @@ Global
 		{BCFCBB89-DB76-48A2-948E-D624CAFBBC00} = {E870F8DC-EA3C-4ECC-A120-D273F19EDD22}
 		{DF3791DC-98B8-4F75-B93D-3C11287C97E4} = {E870F8DC-EA3C-4ECC-A120-D273F19EDD22}
 		{100638BE-06BD-48CD-8614-08483C638A2F} = {E870F8DC-EA3C-4ECC-A120-D273F19EDD22}
+		{0DD6534B-042D-43F3-BB21-AF36CBD7CD67} = {E870F8DC-EA3C-4ECC-A120-D273F19EDD22}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61F7FB11-1E47-470C-91E2-47F8143E1572}

@@ -21,6 +21,7 @@
     <link href="_content/Blazorise.Snackbar/blazorise.snackbar.css" rel="stylesheet" />
     <link href="_content/Blazorise.LoadingIndicator/blazorise.loadingindicator.css" rel="stylesheet" />
     <link href="_content/Blazorise.TreeView/blazorise.treeview.css" rel="stylesheet" />
+    <link href="_content/Blazorise.AnnotatedImage/blazorise.annotatedimage.css" rel="stylesheet" />
 
     <link href="_content/BlazorApp/css/app.css" rel="stylesheet" />
 
@@ -52,21 +53,12 @@
 
     <script src="_content/Blazorise.Canvas/blazorise.canvas.js"></script>
 
+    <script src="_content/BlazorApp/js/location.js"></script>
 
-    <script>
-        window.setPointerCapture = (element, pointerId) => {
-            element.setPointerCapture(pointerId);
-        };
-
-        window.releasePointerCapture = (element, pointerId) => {
-            element.releasePointerCapture(pointerId);
-        }
-        window.hasPointerCapture = (element, pointerId) => {
-            return element.hasPointerCapture(pointerId);
-        }
-    </script>
+    <script src="_content/BlazorApp/js/utilities.js"></script>
 
     <script src="_framework/blazor.webassembly.js"></script>
+
     <script>navigator.serviceWorker.register('service-worker.js');</script>
 
 </body>

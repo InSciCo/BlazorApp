@@ -1,5 +1,12 @@
 ﻿@page "/dragdropzones"
-<DropContainer TItem="DropItem" Items="@items" ItemsFilter="@((item, dropZone) => item.Group == dropZone)" ItemDropped="@ItemDropped" Flex="Flex.Wrap.Grow.Is1">
+<Div     Style="touch-action: none;"
+>
+<DropContainer 
+    TItem="DropItem" 
+    Items="@items" 
+    ItemsFilter="@((item, dropZone) => item.Group == dropZone)" 
+    ItemDropped="@ItemDropped"
+    Flex="Flex.Wrap.Grow.Is1">
     <ChildContent>
         <DropZone TItem="DropItem" Name="Basket" Border="Border.Rounded" Background="Background.Light" Padding="Padding.Is3" Margin="Margin.Is3" Flex="Flex.Grow.Is1">
             <Heading Size="HeadingSize.Is4" Margin="Margin.Is3.FromBottom">Basket</Heading>
@@ -12,7 +19,7 @@
         </DropZone>
     </ChildContent>
     <ItemTemplate>
-        <Card Shadow="Shadow.Default" Margin="Margin.Is3.OnY">
+        <Card Shadow="Shadow.Default" Margin="Margin.Is3.OnY" Class="imageannotation">
             <CardBody>
                 <Image Source="@context.Image" Text="DragDrop image example" Style="width:48px;height:48px;" />
                 @context.Name
@@ -20,6 +27,7 @@
         </Card>
     </ItemTemplate>
 </DropContainer>
+</Div>
 @code {
     public class DropItem
     {

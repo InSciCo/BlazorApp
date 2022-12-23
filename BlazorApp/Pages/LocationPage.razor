@@ -54,7 +54,7 @@ else
         Timeout = 3,
     }
 
-    private DotNetObjectReference<Location> _selfReference;
+    private DotNetObjectReference<LocationPage> _selfReference;
     private int _geolocationWatchId = -1;
     private GeolocationCoordinates? _lastReceivedCoordinates;
     private GeolocationPositionErrorCode _lastReceivedError;
@@ -63,7 +63,7 @@ else
     [SupplyParameterFromQuery(Name = "reloaded")]
     public bool? HasReloaded { get; set; }
 
-    public Location()
+    public LocationPage()
     {
         _selfReference = DotNetObjectReference.Create(this);
     }

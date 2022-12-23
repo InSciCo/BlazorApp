@@ -12,14 +12,14 @@
           crossorigin="anonymous">
 
     <link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
-          rel="stylesheet"
-          crossorigin="anonymous">
+          rel="stylesheet">
 
     <link href="_content/Blazorise/blazorise.css" rel="stylesheet" />
     <link href="_content/Blazorise.Bootstrap5/blazorise.bootstrap5.css" rel="stylesheet" />
     <link href="_content/Blazorise.Snackbar/blazorise.snackbar.css" rel="stylesheet" />
     <link href="_content/Blazorise.LoadingIndicator/blazorise.loadingindicator.css" rel="stylesheet" />
     <link href="_content/Blazorise.TreeView/blazorise.treeview.css" rel="stylesheet" />
+    <link href="_content/Blazorise.AnnotatedImage/blazorise.annotatedimage.css" rel="stylesheet" />
 
     <link href="_content/BlazorApp/css/app.css" rel="stylesheet" />
 </head>
@@ -38,23 +38,11 @@
 
     <script src="_content/Blazorise.Animate/blazorise.animate.js?v=1.1.0.0"></script>
 
+    <script src="_content/BlazorApp/js/location.js"></script>
+
     <script src="_content/Blazorise.Canvas/blazorise.canvas.js"></script>
 
-
-    <script>
-        window.setPointerCapture = (element, pointerId) => {
-            element.setPointerCapture(pointerId);
-        };
-
-        window.releasePointerCapture = (element, pointerId) => {
-            element.releasePointerCapture(pointerId);
-        }
-        window.hasPointerCapture = (element, pointerId) => {
-            return element.hasPointerCapture(pointerId);
-        }
-    </script>
-
-    <script src="_content/BlazorApp/js/location.js"></script>
+    <script src="_content/BlazorApp/js/utilities.js"></script>
 
     <script src="_framework/blazor.webview.js" autostart="false"></script>
 

@@ -1,0 +1,68 @@
+﻿@namespace BlazorApp 
+@page "/dragdrop"
+
+<Div Flex="Flex.Row" Width="Width.Is100">
+
+    <Div Flex="Flex.Column" style="max-width:6rem;">
+        @foreach (var item in items)
+        {
+            <Button Clicked="@((args) => ItemSelected(args,@item))" draggable="false">
+                <Figure draggable="false">
+                    <FigureImage Source="@item.Image" draggable="false"/>
+                    <FigureCaption>@item.Name</FigureCaption>
+                </Figure>
+            </Button>
+        }
+    </Div>
+
+    <Div style="touch-action: none; max-width:1000px;" >
+        <img src="_content/BlazorApp/img/EmptyWeddingHall.png" style="object-fit:contain; width:1000px;" />
+        @foreach(var item in selectedItems)
+        {
+            <ImageAnnotation Name="@item.Name" Source="@item.Source" X="@item.X" Y="@item.Y" ImageHeight="@item.Height" ImageWidth="@item.Width" />
+        }
+    </Div>
+</Div>
+
+@code {
+    private bool mouseDown = false;
+
+    public class DropItem
+    {
+            public string Name { get; init; }
+            public string Image { get; set; }
+    }
+    private List<DropItem> items = new()
+    {
+        new DropItem() { Name = "Apple", Image = "_content/BlazorApp/img/apple.png"},
+        new DropItem() { Name = "Bananas", Image = "_content/BlazorApp/img/bananas.png"},
+        new DropItem() { Name = "Lemon", Image = "_content/BlazorApp/img/lemon.png"},
+        new DropItem() { Name = "Broccoli", Image = "_content/BlazorApp/img/broccoli.png" },
+        new DropItem() { Name = "Strawberry", Image = "_content/BlazorApp/img/strawberry.png"},
+        new DropItem() { Name = "Cherry", Image = "_content/BlazorApp/img/cherry.png"},
+        new DropItem() { Name = "Cabbage", Image = "_content/BlazorApp/img/cabbage.png" },
+    };
+    public class SelectedItem
+    {
+            public int X { get; set; }
+            public int Y { get; set; }
+            public string Source { get; set; } = string.Empty;
+            public int Width { get; set; }
+            public int Height { get; set; }
+            public string Name { get; set; } = string.Empty;
+    }
+    private List<SelectedItem> selectedItems = new();
+    private Task ItemSelected(MouseEventArgs args, DropItem item)
+    {
+        selectedItems.Add(new SelectedItem()
+            {
+                Name = item.Name,
+                Source = item.Image,
+                X = 150,
+                Y = 150,
+                Height = 48,
+                Width = 48
+            });
+        return Task.CompletedTask;
+    }
+}
