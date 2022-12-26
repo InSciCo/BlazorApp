@@ -7,6 +7,7 @@ using Microsoft.JSInterop;
 
 namespace Blazorise.AnnotatedImage;
 
+public enum PointerState { None, Single, Double }
 public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
 {
     #region Members
@@ -28,6 +29,8 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     private int x => X - imageWidth / 2;
     private int y => Y - imageHeight / 2;
     private ElementReference elementRef;
+    private PointerState pointerState;
+    
     #endregion
 
     #region Methods
@@ -35,13 +38,13 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     protected override Task OnInitializedAsync()
     {
         if (JSModule == null)
-            JSModule = new JSAnnotatedImageModule(JSRuntime, VersionProvider);
+            JSModule = new JSAnnotatedImageModule(JSRuntime!, VersionProvider!);
         return base.OnInitializedAsync();
     }
     /// <inheritdoc />
     protected override async Task OnFirstAfterRenderAsync()
     {
-        await JSModule.Initialize();
+        await JSModule!.Initialize();
     }
     /// <inheritdoc/>
     protected override async ValueTask DisposeAsync(bool disposing)
@@ -61,7 +64,7 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
         lastMoveTick = DateTime.UtcNow.Ticks;
         var autoEvent = new AutoResetEvent(false);
         timer = new(OnTimedEvent!, autoEvent, scaleLag, timerInterval);
-        await JSModule.SetPointerCapture(elementRef, args.PointerId);
+        await JSModule!.SetPointerCapture(elementRef, args.PointerId);
     }
     private void OnTimedEvent(Object state)
     {
@@ -118,6 +121,7 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
         
         return Task.CompletedTask;
     }
+
     #endregion
 
     #region Properties
@@ -125,23 +129,23 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     /// <summary>
     /// Gets or sets the JSCameraModule instance.
     /// </summary>
-    protected JSAnnotatedImageModule JSModule { get; private set; }
+    protected JSAnnotatedImageModule? JSModule { get; private set; }
     /// <summary>
     /// Gets or sets the JS runtime.
     /// </summary>
-    [Inject] private IJSRuntime JSRuntime { get; set; }
+    [Inject] private IJSRuntime? JSRuntime { get; set; }
     /// <summary>
     /// Gets or sets the version provider.
     /// </summary>
-    [Inject] private IVersionProvider VersionProvider { get; set; }
+    [Inject] private IVersionProvider? VersionProvider { get; set; }
     /// <summary>
     /// The absolute or relative URL of the image.
     /// </summary>
-    [Parameter] public string Source { get; set; }
+    [Parameter] public string Source { get; set; } = string.Empty;
     /// <summary>
     /// Alternate text for an image.
     /// </summary>
-    [Parameter] public string Text { get; set; }
+    [Parameter] public string Text { get; set; } = string.Empty;
     /// <summary>
     /// Forces an image to take up the whole width.
     /// </summary>
