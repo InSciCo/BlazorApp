@@ -1,68 +1,144 @@
 ﻿@namespace BlazorApp 
 @page "/dragdrop"
+@using System.Text;
+@inject IJSRuntime JSRuntime
+@inject HttpClient httpClient
 
-<Div Flex="Flex.Row" Width="Width.Is100">
+<Div Flex="Flex.Column">
+    <Div Flex="Flex.Row" Width="Width.Is100">
 
-    <Div Flex="Flex.Column" style="max-width:6rem;">
-        @foreach (var item in items)
-        {
-            <Button Clicked="@((args) => ItemSelected(args,@item))" draggable="false">
-                <Figure draggable="false">
-                    <FigureImage Source="@item.Image" draggable="false"/>
-                    <FigureCaption>@item.Name</FigureCaption>
-                </Figure>
-            </Button>
-        }
+        <Div Flex="Flex.Column" style="max-width:6rem;">
+            @foreach (var item in items)
+            {
+                <Button Clicked="@((args) => ItemSelected(args,@item))" draggable="false">
+                    <Figure draggable="false">
+                        <FigureImage Source="@item.Image" draggable="false"/>
+                        <FigureCaption>@item.Name</FigureCaption>
+                    </Figure>
+                </Button>
+            }
+            <Button Color="Color.Primary" Clicked="Merge">Merge</Button>
+
+        </Div>
+        <div class="annotatedimage" >
+            <img @ref="image" src="@imgSrc"  />
+            @foreach(var item in selectedItems)
+            {
+                <ImageAnnotation 
+                    Name="@item.Name" 
+                    Source="@item.Source" 
+                    X="@item.X" 
+                    Y="@item.Y" 
+                    ImageHeight="@item.Height" 
+                    ImageWidth="@item.Width" />
+            }
+        </div>
     </Div>
+    <img src="@imgData"  style="touch-action:none; max-width:500px"/>
 
-    <Div style="touch-action: none; max-width:1000px;" >
-        <img src="_content/BlazorApp/img/EmptyWeddingHall.png" style="object-fit:contain; width:1000px;" />
-        @foreach(var item in selectedItems)
-        {
-            <ImageAnnotation Name="@item.Name" Source="@item.Source" X="@item.X" Y="@item.Y" ImageHeight="@item.Height" ImageWidth="@item.Width" />
-        }
-    </Div>
 </Div>
-
+ 
 @code {
     private bool mouseDown = false;
+    private ElementReference image;
+    private string imgData = string.Empty;
+    private string imgSrc = "_content/BlazorApp/img/EmptyWeddingHall.png";
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+    public async Task Merge()
+    {
+        SKBitmap bitmap;
+        bitmap = await GetImageBitmap(imgSrc);
 
+        var width = bitmap.Width;
+        var height = bitmap.Height;
+
+        // Create Image in Skia
+        var info = new SKImageInfo(width, height);
+
+        using (var surface = SKSurface.Create(info))
+        {
+            // the the canvas and properties
+            var canvas = surface.Canvas;
+
+            // make sure the canvas is blank
+            canvas.Clear(SKColors.White);
+
+            // draw background image
+            //canvas.DrawBitmap(bitmap, 0.0f, 0.0f);
+            var rect = new SKRect(0.0f, 0.0f, width, height);
+            canvas.DrawBitmap(bitmap, rect);
+
+            // draw some text
+            var paint = new SKPaint
+                {
+                    Color = SKColors.Black,
+                    IsAntialias = true,
+                    Style = SKPaintStyle.Fill,
+                    TextAlign = SKTextAlign.Center,
+                    TextSize = 24
+                };
+
+            var coord = new SKPoint(info.Width / 2, (info.Height + paint.TextSize) / 2);
+            canvas.DrawText("SkiaSharp", coord, paint);
+
+            imgData = "data:image/png;base64,"
+                + Convert.ToBase64String(
+                    surface
+                    .Snapshot()
+                    .Encode(SKEncodedImageFormat.Png, 100)
+                    .ToArray());
+        }
+    }
+    public async Task<SKBitmap> GetImageBitmap(string url)
+    {
+        using (Stream stream = await httpClient.GetStreamAsync(url))
+        using (MemoryStream memStream = new MemoryStream())
+        {
+            await stream.CopyToAsync(memStream);
+            memStream.Seek(0, SeekOrigin.Begin);
+            return SKBitmap.Decode(memStream);
+        }
+    }
     public class DropItem
     {
-            public string Name { get; init; }
-            public string Image { get; set; }
+        public string Name { get; init; }
+        public string Image { get; set; }
     }
     private List<DropItem> items = new()
     {
         new DropItem() { Name = "Apple", Image = "_content/BlazorApp/img/apple.png"},
-        new DropItem() { Name = "Bananas", Image = "_content/BlazorApp/img/bananas.png"},
-        new DropItem() { Name = "Lemon", Image = "_content/BlazorApp/img/lemon.png"},
-        new DropItem() { Name = "Broccoli", Image = "_content/BlazorApp/img/broccoli.png" },
-        new DropItem() { Name = "Strawberry", Image = "_content/BlazorApp/img/strawberry.png"},
-        new DropItem() { Name = "Cherry", Image = "_content/BlazorApp/img/cherry.png"},
-        new DropItem() { Name = "Cabbage", Image = "_content/BlazorApp/img/cabbage.png" },
+        new DropItem() { Name = "Bananas", Image = "_content/BlazorApp/img/bananas.png"}
     };
     public class SelectedItem
     {
-            public int X { get; set; }
-            public int Y { get; set; }
-            public string Source { get; set; } = string.Empty;
-            public int Width { get; set; }
-            public int Height { get; set; }
-            public string Name { get; set; } = string.Empty;
+        public int X { get; set; }
+        public int Y { get; set; }
+        public string Source { get; set; } = string.Empty;
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
     private List<SelectedItem> selectedItems = new();
-    private Task ItemSelected(MouseEventArgs args, DropItem item)
+    private async Task ItemSelected(MouseEventArgs args, DropItem item)
     {
+        int imageWidth = await JSRuntime.InvokeAsync<int>("getWidth", image);
+        int imageHeight = await JSRuntime.InvokeAsync<int>("getHeight", image);
+
         selectedItems.Add(new SelectedItem()
             {
                 Name = item.Name,
                 Source = item.Image,
-                X = 150,
-                Y = 150,
+                //X = (int)(imageWidth/2),
+                //Y = (int)(imageHeight/2),
+                X = 48,
+                Y = 48,
                 Height = 48,
                 Width = 48
             });
-        return Task.CompletedTask;
+        // await InvokeAsync(StateHasChanged);
+        await Task.CompletedTask;
     }
 }

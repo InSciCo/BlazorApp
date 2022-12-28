@@ -52,7 +52,7 @@ export function takepicture() {
     // Firefox currently has a bug where the height can't be read from
     // the video, so we will make assumptions if this happens.
     if (isNaN(video.videoHeight)) 
-        canvas.height = video.videoWidth / (4 /3 );
+        canvas.height = video.videoWidth / (4/3 );
     else 
         canvas.height = video.videoHeight;
 

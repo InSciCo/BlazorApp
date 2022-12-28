@@ -35,14 +35,10 @@
 		<PackageReference Include="KristofferStrube.Blazor.FileSystemAccess" Version="2.1.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0" />
 		<PackageReference Include="ReactiveUI.Blazor" Version="18.4.1" />
-
-	</ItemGroup>
-
-	<ItemGroup>
+		<PackageReference Include="SkiaSharp.Views.Blazor" Version="2.88.3" />
 		<ProjectReference Include="..\BlazorApp.ViewModels\BlazorApp.ViewModels.csproj" />
 		<ProjectReference Include="..\Blazorise.AnnotatedImage\Blazorise.AnnotatedImage.csproj" />
 		<ProjectReference Include="..\Blazorise.Camera\Blazorise.Camera.csproj" />
-		<ProjectReference Include="..\Blazorise.Canvas\Blazorise.Canvas.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

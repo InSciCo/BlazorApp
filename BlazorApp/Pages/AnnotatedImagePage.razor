@@ -1,0 +1,66 @@
+﻿@namespace BlazorApp 
+@page "/annotatedimage"
+<h3>AnnotatedImagePage</h3>
+
+<Div Flex="Flex.Column">
+    <Div Flex="Flex.Row">
+        @* Available Items *@
+        <Div Flex="Flex.Column" style="max-width:6rem;">
+            @foreach (var item in items)
+            {
+                <Button Clicked="@((args) => ItemSelected(args,@item))" draggable="false">
+                    <Figure draggable="false">
+                        <FigureImage Source="@item.Image" draggable="false" />
+                        <FigureCaption>@item.Name</FigureCaption>
+                    </Figure>
+                </Button>
+            }
+            <Button Color="Color.Primary" Clicked="Merge">Merge</Button>
+        </Div>
+
+        @* Annotated Image *@
+        <AnnotatedImage 
+            @ref="@annotatedImage"
+            Source="_content/BlazorApp/img/EmptyWeddingHall.png" />
+    </Div>
+</Div>
+
+
+@code {
+    private AnnotatedImage? annotatedImage;
+
+    public class DropItem
+    {
+        public string Name { get; init; }
+        public string Image { get; set; }
+    }
+    private List<DropItem> items = new()
+    {
+        new DropItem() { Name = "Apple", Image = "_content/BlazorApp/img/apple.png"},
+        new DropItem() { Name = "Bananas", Image = "_content/BlazorApp/img/bananas.png"}
+    };
+
+    private async Task ItemSelected(MouseEventArgs args, DropItem item)
+    {
+        var imageWidth = annotatedImage.ImgElementWidth;
+        var imageHeight = annotatedImage.ImgElementHeight;
+
+
+        await annotatedImage!.AddSelectedItem(new SelectedItem()
+            {
+                Name = item.Name,
+                Source = item.Image,
+                X = (int)(imageWidth / 2),
+                Y = (int)(imageHeight / 2),
+                Height = 48,
+                Width = 48
+            });
+        await Task.CompletedTask;
+    }
+
+    public Task Merge()
+    {
+        return Task.CompletedTask;
+    }
+
+}

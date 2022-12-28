@@ -10,8 +10,15 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    position: absolute;
 }
 
-.imageannotationcontainer {
-    position: absolute;
+.annotatedimage {
+    touch-action: none;
+    position: relative;
+}
+
+.annotatedimage img {
+    touch-action: none;
+    object-fit: contain;
 }

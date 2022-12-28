@@ -2,10 +2,24 @@
 using System.Threading.Tasks;
 using Blazorise.Modules;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 #endregion
 
 namespace Blazorise.AnnotatedImage;
+
+public class BoundingClientRect
+{
+    public double X { get; set; }
+    public double Y { get; set; }
+    public double Width { get; set; }
+    public double Height { get; set; }
+    public double Top { get; set; }
+    public double Right { get; set; }
+    public double Bottom { get; set; }
+    public double Left { get; set; }
+}
+
 
 public class JSAnnotatedImageModule : BaseJSModule
 {
@@ -25,6 +39,16 @@ public class JSAnnotatedImageModule : BaseJSModule
         => InvokeSafeVoidAsync("initialize");
     public virtual ValueTask SetPointerCapture(ElementReference elementRef, long pointerId)
         => InvokeSafeVoidAsync("setPointerCapture",elementRef,pointerId);
+
+    public virtual ValueTask<int> GetImgHeight(ElementReference elementRef)
+        => InvokeSafeAsync<int>("getImgHeight",elementRef);
+
+    public virtual ValueTask<int> GetImgWidth(ElementReference elementRef)
+        => InvokeSafeAsync<int>("getImgWidth", elementRef);
+
+    public virtual ValueTask<BoundingClientRect>GetBoundingClientRect(ElementReference elementRef)
+        => InvokeSafeAsync<BoundingClientRect>("GetBoundingClientRect", elementRef);
+
     #endregion
 
     #region Properties

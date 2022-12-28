@@ -1,5 +1,6 @@
 ﻿#region Using directives
 using Blazorise.Extensions;
+using Blazorise.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -30,10 +31,14 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     private int y => Y - imageHeight / 2;
     private ElementReference elementRef;
     private PointerState pointerState;
-    
     #endregion
 
     #region Methods
+    protected override void BuildClasses(ClassBuilder builder)
+    {
+        builder.Append("imageannotation");
+        base.BuildClasses(builder);
+    }
     /// <inheritdoc/>
     protected override Task OnInitializedAsync()
     {
@@ -154,7 +159,9 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     [Parameter] public int Y { get; set; }
     [Parameter] public int ImageWidth { get;set; }
     [Parameter] public int ImageHeight { get; set; }
-    [Parameter] public double Scale { get; set; } = 1.0;    
+    [Parameter] public double Scale { get; set; } = 1.0;
+    [Parameter] public ElementReference AnnotaedImageRef { get; set; }
+
 
     #endregion
 
