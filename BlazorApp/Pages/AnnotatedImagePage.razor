@@ -23,11 +23,28 @@
             @ref="@annotatedImage"
             Source="_content/BlazorApp/img/EmptyWeddingHall.png" />
     </Div>
+    <img src="@imgdata" width="@imgwidth" height="@imgheight" />
+
 </Div>
 
 
 @code {
+
+public class FruitItems : IImageAnnotationData
+{
+    public double X { get; set; }
+    public double Y { get; set; }
+    public string Source { get; set; } = string.Empty;
+    public double Width { get; set; }
+    public double Height { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public double Scale { get; set; }   
+}
+
     private AnnotatedImage? annotatedImage;
+    private string imgdata = string.Empty;
+    private double imgwidth;
+    private double imgheight;
 
     public class DropItem
     {
@@ -45,22 +62,38 @@
         var imageWidth = annotatedImage.ImgElementWidth;
         var imageHeight = annotatedImage.ImgElementHeight;
 
-
-        await annotatedImage!.AddSelectedItem(new SelectedItem()
+        var selectedItem = new FruitItems()
             {
                 Name = item.Name,
                 Source = item.Image,
-                X = (int)(imageWidth / 2),
-                Y = (int)(imageHeight / 2),
+                X = imageWidth / 2,
+                Y = imageHeight / 2,
                 Height = 48,
-                Width = 48
-            });
+                Width = 48,
+                Scale = 1
+            };
+
+        await annotatedImage!.AddAnnotation(selectedItem);
         await Task.CompletedTask;
     }
 
-    public Task Merge()
+    public async Task Merge()
     {
-        return Task.CompletedTask;
-    }
+        var sKImage = await annotatedImage!.GetImage();
+        var info = new SKImageInfo(sKImage.Width, sKImage.Height);
+        using (var surface = SKSurface.Create(info))
+        {
+            var canvas = surface.Canvas;
+            canvas.DrawImage(sKImage, new SKPoint(0, 0));
+            imgdata = "data:image/png;base64,"
+            + Convert.ToBase64String(
+                surface.Snapshot()
+                .Encode(SKEncodedImageFormat.Png, 100)
+                .ToArray());
+            imgwidth = sKImage.Width;
+            imgheight = sKImage.Height;
 
+        }
+
+    }
 }

@@ -1,24 +1,20 @@
 ﻿@namespace Blazorise.AnnotatedImage
 @inherits BaseComponent
 @using System.Text
-@inject HttpClient httpClient
 <div class="@ClassNames"
      style="@StyleNames"
      id="@ElementId"
+     @ref="AnnotatedImageRef"
      @attributes="@Attributes">
     <img 
         @ref="imgRef" 
         src="@Source">
     </img>
-    @foreach(var item in SelectedItems)
+    @foreach(var item in Annotations)
     {
         <ImageAnnotation 
-            Name="@item.Name" 
-            Source="@item.Source" 
-            X="@item.X" 
-            Y="@item.Y" 
-            ImageHeight="@item.Height" 
-            ImageWidth="@item.Width" />
+            ImageAnnotationData="@item"
+            CanvasRect="@CanvasRect"/>
     }
 </div>
 

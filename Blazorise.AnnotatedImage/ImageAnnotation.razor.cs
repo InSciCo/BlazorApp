@@ -4,17 +4,29 @@ using Blazorise.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Microsoft.VisualBasic;
 #endregion
 
 namespace Blazorise.AnnotatedImage;
+
+public interface IImageAnnotationData
+{
+    public double X { get; set; }
+    public double Y { get; set; }
+    public string Source { get; set; }
+    public double Width { get; set; }
+    public double Height { get; set; }
+    public string Name { get; set; }
+    public double Scale { get; set; }
+}
 
 public enum PointerState { None, Single, Double }
 public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
 {
     #region Members
     private string containerPos => $"top:{y}px; left:{x}px; width:{imageWidth}px; height:{imageHeight}px;";
-    private int pageX;
-    private int pageY;
+    private double pageX;
+    private double pageY;
     private bool pointerDown;
     private long lastMoveTick;
     private double scale = 1.0;
@@ -25,10 +37,12 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     private long timerInterval = 400; // number of msec between calls to OnTimedEvent
     private long scaleLag = 1200; // number of msec before start of scaling
     private bool scaling;
-    private int imageHeight => (int)(Scale * ImageHeight);
-    private int imageWidth => (int) (Scale * ImageWidth);
-    private int x => X - imageWidth / 2;
-    private int y => Y - imageHeight / 2;
+    private double imageHeight => (ImageAnnotationData != null) ? ImageAnnotationData.Scale * ImageAnnotationData.Height : 0;
+    private double imageWidth => (ImageAnnotationData != null) ? ImageAnnotationData.Scale * ImageAnnotationData.Width : 0;
+    private double x => (ImageAnnotationData != null) ? ImageAnnotationData.X - imageWidth / 2.0 : 0;
+    private double y => (ImageAnnotationData != null) ? ImageAnnotationData.Y - imageHeight / 2.0 : 0;
+    private double xCenterOffset;
+    private double yCenterOffset;   
     private ElementReference elementRef;
     private PointerState pointerState;
     #endregion
@@ -62,8 +76,9 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     {
         if (pointerDown)
             return;
-        pageX = (int)args.PageX;
-        pageY = (int)args.PageY; 
+        pageX = args.PageX;
+        pageY = args.PageY;
+        CalculateCenterOffset(args.PageX, args.PageY);
         pointerDown = true;
         scaling = false;
         lastMoveTick = DateTime.UtcNow.Ticks;
@@ -73,20 +88,20 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     }
     private void OnTimedEvent(Object state)
     {
-        if(!pointerDown) 
+        if (!pointerDown)
             return;
 
-        var elapsedTime = (DateTime.UtcNow.Ticks - lastMoveTick) / 1000 ;
+        var elapsedTime = (DateTime.UtcNow.Ticks - lastMoveTick) / 1000;
         Console.WriteLine(elapsedTime.ToString());
         if (!scaling && (elapsedTime < scaleLag))
             return;
 
         scaling = true;
 
-        Scale += scaleIncrement;
+        ImageAnnotationData.Scale += scaleIncrement;
 
-        if (Scale > scaleTop)
-            Scale = scaleBottom;
+        if (ImageAnnotationData.Scale > scaleTop)
+            ImageAnnotationData.Scale = scaleBottom;
 
         lastMoveTick = DateTime.UtcNow.Ticks;
         InvokeAsync(StateHasChanged);
@@ -99,12 +114,7 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
         scaling = false;
         lastMoveTick = DateTime.UtcNow.Ticks;
 
-        var movementX = (int)args.PageX - pageX;
-        pageX = (int)args.PageX;
-        X += movementX;
-        var movementY = (int)args.PageY - pageY;
-        pageY = (int)args.PageY;
-        Y += movementY;
+        CalculateMovement(args.PageX, args.PageY);
 
         return Task.CompletedTask;
     }
@@ -117,14 +127,33 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
         pointerDown = false;
         scaling = false;
 
-        var movementX = (int)args.PageX - pageX;
-        pageX = (int)args.PageX;
-        X += movementX;
-        var movementY = (int)args.PageY - pageY;
-        pageY = (int)args.PageY;
-        Y += movementY;
-        
+        CalculateMovement(args.PageX, args.PageY);
+
         return Task.CompletedTask;
+    }
+
+    private void CalculateMovement(double x, double y)
+    {
+
+        if(CanvasRect != null)
+        {
+            if(x + xCenterOffset < CanvasRect.Left) x= CanvasRect.Left + xCenterOffset;
+            if(x + xCenterOffset > CanvasRect.Right) x= CanvasRect.Right + xCenterOffset;     
+            if(y + yCenterOffset < CanvasRect.Top) y= CanvasRect.Top + yCenterOffset;
+            if(y + yCenterOffset > CanvasRect.Bottom) y= CanvasRect.Bottom + yCenterOffset; 
+        }
+
+        ImageAnnotationData.X += x - pageX;
+        ImageAnnotationData.Y += y - pageY;
+
+        pageX = x;
+        pageY = y;
+    }
+    private async void CalculateCenterOffset(double x, double y)
+    {
+        var imgRect = await JSModule!.GetBoundingClientRect(elementRef);
+        xCenterOffset = x - imgRect.Left - (imgRect.Width / 2) ;
+        yCenterOffset = y - imgRect.Top  - (imgRect.Height / 2) ;
     }
 
     #endregion
@@ -155,13 +184,9 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     /// Forces an image to take up the whole width.
     /// </summary>
     [Parameter] public bool Fluid { get; set; }
-    [Parameter] public int X { get; set; }
-    [Parameter] public int Y { get; set; }
-    [Parameter] public int ImageWidth { get;set; }
-    [Parameter] public int ImageHeight { get; set; }
-    [Parameter] public double Scale { get; set; } = 1.0;
-    [Parameter] public ElementReference AnnotaedImageRef { get; set; }
 
+    [Parameter] public IImageAnnotationData ImageAnnotationData { get; set; } 
+    [Parameter] public BoundingClientRect? CanvasRect { get; set; }  
 
     #endregion
 
