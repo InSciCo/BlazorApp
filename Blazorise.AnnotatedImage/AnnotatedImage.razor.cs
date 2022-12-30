@@ -17,12 +17,7 @@ namespace Blazorise.AnnotatedImage
     public partial class AnnotatedImage : BaseComponent, IAsyncDisposable
     {
         #region Members 
-        private SKBitmap? bitmap;
-        private ElementReference hiddenImage;
-        private string hiddenImageSrc = string.Empty;
-        private ElementReference yadaImg;
-        private ElementReference yada2Img;
-        private string yada2ImgData;
+
         #endregion
 
         #region Methods 
@@ -110,8 +105,9 @@ namespace Blazorise.AnnotatedImage
                     var resizeInfo = new SKImageInfo((int)width, (int)height);     
                     var resizedBitmap = new SKBitmap(resizeInfo);
                     sourceBitmap.ScalePixels(resizedBitmap, SKFilterQuality.High);
-                    var resizedImage = SKImage.FromBitmap(resizedBitmap);
-                    canvas.DrawImage(resizedImage, new SKRect(x,y,x2,y2));
+                    //var resizedImage = SKImage.FromBitmap(resizedBitmap);
+                    //canvas.DrawImage(resizedImage, new SKRect(x,y,x2,y2));
+                    canvas.DrawBitmap(resizedBitmap, new SKRect(x, y, x2, y2));
                 }
 
                 var imgdata = 
