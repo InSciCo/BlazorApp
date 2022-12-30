@@ -13,7 +13,8 @@
     @foreach(var item in Annotations)
     {
         <ImageAnnotation 
-            ImageAnnotationData="@item"
+            @ref="item.ImageAnnotation"
+            ImageAnnotationData="@item.AnnotationData"
             CanvasRect="@CanvasRect"/>
     }
 </div>

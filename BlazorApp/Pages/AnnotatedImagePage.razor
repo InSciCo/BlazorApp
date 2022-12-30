@@ -1,5 +1,6 @@
 ﻿@namespace BlazorApp 
 @page "/annotatedimage"
+@inject IJSRuntime JSRuntime 
 <h3>AnnotatedImagePage</h3>
 
 <Div Flex="Flex.Column">
@@ -24,22 +25,21 @@
             Source="_content/BlazorApp/img/EmptyWeddingHall.png" />
     </Div>
     <img src="@imgdata" width="@imgwidth" height="@imgheight" />
-
 </Div>
 
 
 @code {
 
-public class FruitItems : IImageAnnotationData
-{
-    public double X { get; set; }
-    public double Y { get; set; }
-    public string Source { get; set; } = string.Empty;
-    public double Width { get; set; }
-    public double Height { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public double Scale { get; set; }   
-}
+    public class FruitItems : IImageAnnotationData
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public string Source { get; set; } = string.Empty;
+        public double Width { get; set; }
+        public double Height { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public double Scale { get; set; }   
+    }
 
     private AnnotatedImage? annotatedImage;
     private string imgdata = string.Empty;
@@ -79,21 +79,9 @@ public class FruitItems : IImageAnnotationData
 
     public async Task Merge()
     {
-        var sKImage = await annotatedImage!.GetImage();
-        var info = new SKImageInfo(sKImage.Width, sKImage.Height);
-        using (var surface = SKSurface.Create(info))
-        {
-            var canvas = surface.Canvas;
-            canvas.DrawImage(sKImage, new SKPoint(0, 0));
-            imgdata = "data:image/png;base64,"
-            + Convert.ToBase64String(
-                surface.Snapshot()
-                .Encode(SKEncodedImageFormat.Png, 100)
-                .ToArray());
-            imgwidth = sKImage.Width;
-            imgheight = sKImage.Height;
-
-        }
-
+        imgdata = await annotatedImage!.GetMergedEncodedImage();
+        imgwidth = annotatedImage.ImgElementWidth;
+        imgheight = annotatedImage.ImgElementHeight;
+        await InvokeAsync(StateHasChanged);
     }
 }

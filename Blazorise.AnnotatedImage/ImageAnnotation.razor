@@ -2,14 +2,15 @@
 @inherits BaseComponent
 <div @onclick:preventDefault="true"
      draggable="false"
-     @ref="elementRef"
+     @ref="ElementRef"
+     id="@ElementId" class="@ClassNames" @attributes="@Attributes"
      @onpointerdown=PointerDown
      @onpointermove=PointerMove
      @onpointerup=PointerUp
-     class="@ClassNames"
      style="@containerPos">
     <img draggable="false"
-         src="@ImageAnnotationData.Source"
+         @ref="ImgRef"
+         src="@ImageAnnotationData!.Source"
          class="figure-img img-fluid"
           />
 </div>

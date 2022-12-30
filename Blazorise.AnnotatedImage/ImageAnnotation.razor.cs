@@ -37,13 +37,13 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     private long timerInterval = 400; // number of msec between calls to OnTimedEvent
     private long scaleLag = 1200; // number of msec before start of scaling
     private bool scaling;
-    private double imageHeight => (ImageAnnotationData != null) ? ImageAnnotationData.Scale * ImageAnnotationData.Height : 0;
-    private double imageWidth => (ImageAnnotationData != null) ? ImageAnnotationData.Scale * ImageAnnotationData.Width : 0;
-    private double x => (ImageAnnotationData != null) ? ImageAnnotationData.X - imageWidth / 2.0 : 0;
-    private double y => (ImageAnnotationData != null) ? ImageAnnotationData.Y - imageHeight / 2.0 : 0;
+    private double imageHeight => ImageAnnotationData!.Scale * ImageAnnotationData.Height;
+    private double imageWidth => ImageAnnotationData!.Scale * ImageAnnotationData.Width;
+    private double x => ImageAnnotationData!.X - imageWidth / 2.0;
+    private double y => ImageAnnotationData!.Y - imageHeight / 2.0;
     private double xCenterOffset;
     private double yCenterOffset;   
-    private ElementReference elementRef;
+    //private ElementReference elementRef;
     private PointerState pointerState;
     #endregion
 
@@ -64,6 +64,9 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     protected override async Task OnFirstAfterRenderAsync()
     {
         await JSModule!.Initialize();
+        Console.WriteLine($"ImgRef:{ImgRef.Id}");
+        var yada = await JSModule!.GetBase64Image(ImgRef);
+        Console.WriteLine(yada.ToString());
     }
     /// <inheritdoc/>
     protected override async ValueTask DisposeAsync(bool disposing)
@@ -84,7 +87,7 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
         lastMoveTick = DateTime.UtcNow.Ticks;
         var autoEvent = new AutoResetEvent(false);
         timer = new(OnTimedEvent!, autoEvent, scaleLag, timerInterval);
-        await JSModule!.SetPointerCapture(elementRef, args.PointerId);
+        await JSModule!.SetPointerCapture(ElementRef, args.PointerId);
     }
     private void OnTimedEvent(Object state)
     {
@@ -151,7 +154,7 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     }
     private async void CalculateCenterOffset(double x, double y)
     {
-        var imgRect = await JSModule!.GetBoundingClientRect(elementRef);
+        var imgRect = await JSModule!.GetBoundingClientRect(ElementRef);
         xCenterOffset = x - imgRect.Left - (imgRect.Width / 2) ;
         yCenterOffset = y - imgRect.Top  - (imgRect.Height / 2) ;
     }
@@ -167,6 +170,7 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     /// <summary>
     /// Gets or sets the JS runtime.
     /// </summary>
+    public ElementReference ImgRef { get; private set; }    
     [Inject] private IJSRuntime? JSRuntime { get; set; }
     /// <summary>
     /// Gets or sets the version provider.
@@ -185,7 +189,7 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     /// </summary>
     [Parameter] public bool Fluid { get; set; }
 
-    [Parameter] public IImageAnnotationData ImageAnnotationData { get; set; } 
+    [Parameter] public IImageAnnotationData? ImageAnnotationData { get; set; } 
     [Parameter] public BoundingClientRect? CanvasRect { get; set; }  
 
     #endregion
