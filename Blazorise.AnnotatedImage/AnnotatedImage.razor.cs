@@ -105,8 +105,6 @@ namespace Blazorise.AnnotatedImage
                     var resizeInfo = new SKImageInfo((int)width, (int)height);     
                     var resizedBitmap = new SKBitmap(resizeInfo);
                     sourceBitmap.ScalePixels(resizedBitmap, SKFilterQuality.High);
-                    //var resizedImage = SKImage.FromBitmap(resizedBitmap);
-                    //canvas.DrawImage(resizedImage, new SKRect(x,y,x2,y2));
                     canvas.DrawBitmap(resizedBitmap, new SKRect(x, y, x2, y2));
                 }
 

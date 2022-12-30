@@ -55,13 +55,6 @@ public class JSAnnotatedImageModule : BaseJSModule
     public virtual ValueTask<string> GetBase64Image(ElementReference img)
         => InvokeSafeAsync<string>("getBase64Image", img);
 
-    public virtual ValueTask CreateMergeCanvas(ElementReference img)
-        => InvokeSafeVoidAsync("createMergeCanvas", img);
-
-    public virtual ValueTask AddAnnotation(ElementReference img, double x, double y, double width, double height)
-        => InvokeSafeVoidAsync("addAnnotation", img, x, y, width, height);
-    public virtual ValueTask<string> GetMergeImageURL()
-        => InvokeSafeAsync<string>("getMergeImageURL");
     #endregion
 
     #region Properties
