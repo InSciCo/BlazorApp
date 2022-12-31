@@ -4,7 +4,6 @@ using Blazorise.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
-using Microsoft.VisualBasic;
 #endregion
 
 namespace Blazorise.AnnotatedImage;
@@ -12,6 +11,7 @@ namespace Blazorise.AnnotatedImage;
 public interface IImageAnnotationData
 {
     public string Id { get; set; }
+    public int Order { get; set; }  
     public double X { get; set; }
     public double Y { get; set; }
     public string Source { get; set; }

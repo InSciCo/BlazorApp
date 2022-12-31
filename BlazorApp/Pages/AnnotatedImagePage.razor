@@ -17,6 +17,7 @@
                 </Button>
             }
             <Button Color="Color.Primary" Clicked="Merge">Merge</Button>
+            <Button Color="Color.Primary" Clicked="Reverse">Reverse</Button>
             <Button Color="Color.Primary" Clicked="Clear">Clear</Button>
         </Div>
 
@@ -34,6 +35,7 @@
     public class SelectedFruitItem : IImageAnnotationData
     {
         public string Id { get; set; } = string.Empty;
+        public int Order { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
         public string Source { get; set; } = string.Empty;
@@ -49,6 +51,7 @@
     private double imgwidth;
     private double imgheight;
     private Dictionary<string, IImageAnnotationData> fruitItems = new();
+    private int order;
 
     public class FruitItem
     {
@@ -67,9 +70,10 @@
         var imageWidth = annotatedImage.ImgElementWidth;
         var imageHeight = annotatedImage.ImgElementHeight;
         var id = Guid.NewGuid().ToString();
-        fruitItems.Add(id,new SelectedFruitItem()
+        fruitItems.Add(id, new SelectedFruitItem()
             {
                 Id = id,
+                Order = order++,
                 Name = item.Name,
                 Source = item.Image,
                 X = imageWidth / 2,
@@ -89,6 +93,19 @@
         await Task.CompletedTask;
     }
 
+    private async Task Reverse()
+    {
+        var order = 0;
+        fruitItems
+            .Values
+            .OrderBy(x => x.Order)
+            .Select(x => x.Id)
+            .Reverse()
+            .ToList()
+            .ForEach(x => fruitItems[x].Order = order++);
+        await Task.CompletedTask;
+    }
+
     public async Task Merge()
     {
         if (annotatedImage is null)
@@ -98,4 +115,5 @@
         imgheight = annotatedImage.ImgElementHeight;
         await InvokeAsync(StateHasChanged);
     }
+
 }

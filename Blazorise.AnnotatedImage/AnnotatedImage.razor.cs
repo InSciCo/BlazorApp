@@ -6,6 +6,7 @@ using SkiaSharp;
 using Blazorise.Utilities;
 using Blazorise.Extensions;
 using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 #endregion
 
 namespace Blazorise.AnnotatedImage
@@ -20,6 +21,7 @@ namespace Blazorise.AnnotatedImage
     {
         #region Members 
         protected Dictionary<string,Annotation> annotations = new();
+        protected ElementReference backgroundImageRef;
         #endregion
 
         #region Methods 
@@ -35,21 +37,18 @@ namespace Blazorise.AnnotatedImage
         protected async override Task OnParametersSetAsync()
         {
             JSModule ??= new JSAnnotatedImageModule(JSRuntime!, VersionProvider!);
-            List<string> delList = annotations.Keys.ToList();   
+            List<string> delList = annotations.Keys.ToList();  
             foreach(var item in ImageAnnotations.Values)
-                if (delList.Contains(item.Id))
+                if(!annotations.TryAdd(item.Id, new Annotation() { AnnotationData = item }))
                     delList.Remove(item.Id);
-                else
-                    annotations.Add(item.Id, new Annotation() { AnnotationData = item });
-            foreach (var item in delList)
-                annotations.Remove(item);
+            delList.ForEach(x => annotations.Remove(x));
             await base.OnParametersSetAsync();
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
             // read the current width and height of the img element
-            CanvasRect = await JSModule!.GetBoundingClientRect(imgRef);
+            CanvasRect = await JSModule!.GetBoundingClientRect(backgroundImageRef);
             ImgElementHeight = CanvasRect.Height;
             ImgElementWidth = CanvasRect.Width;
         }
@@ -70,7 +69,7 @@ namespace Blazorise.AnnotatedImage
         }
         public async Task<string> GetMergedEncodedImage()
         {
-            var backgroundImage = await GetImage(imgRef);
+            var backgroundImage = await GetImage(backgroundImageRef);
             var info = new SKImageInfo(backgroundImage.Width, backgroundImage.Height);
             using (var surface = SKSurface.Create(info))
             {
@@ -125,9 +124,7 @@ namespace Blazorise.AnnotatedImage
 
         [Parameter] public Dictionary<string,IImageAnnotationData> ImageAnnotations { get; set; } = new();
         public BoundingClientRect? CanvasRect { get; private set; }
-        public ElementReference imgRef;
-        public ElementReference AnnotatedImageRef;
-       
+
         /// <summary>
         /// Width of original image
         /// </summary>
