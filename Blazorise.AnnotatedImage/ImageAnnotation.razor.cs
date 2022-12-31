@@ -31,7 +31,7 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     private double pageY;
     private bool pointerDown;
     private long lastMoveTick;
-    private double scale = 1.0;
+    //private double scale = 1.0;
     private double scaleTop = 2.0;
     private double scaleBottom = 0.5;
     private double scaleIncrement = 0.25;
@@ -45,8 +45,6 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     private double y => ImageAnnotationData!.Y - imageHeight / 2.0;
     private double xCenterOffset;
     private double yCenterOffset;   
-    //private ElementReference elementRef;
-    private PointerState pointerState;
     #endregion
 
     #region Methods
@@ -89,7 +87,7 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     }
     private void OnTimedEvent(Object state)
     {
-        if (!pointerDown)
+        if (!pointerDown || ImageAnnotationData is null)
             return;
 
         var elapsedTime = (DateTime.UtcNow.Ticks - lastMoveTick) / 1000;
@@ -135,6 +133,8 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
 
     private void CalculateMovement(double x, double y)
     {
+        if (ImageAnnotationData is null)
+            return;
 
         if(CanvasRect != null)
         {

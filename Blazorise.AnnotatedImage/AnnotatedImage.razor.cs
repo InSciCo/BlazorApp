@@ -30,7 +30,6 @@ namespace Blazorise.AnnotatedImage
         }
         protected async override Task OnInitializedAsync()
         {
-
             await base.OnInitializedAsync();
         }
         protected async override Task OnParametersSetAsync()
@@ -83,7 +82,7 @@ namespace Blazorise.AnnotatedImage
                     var annotationImage = await GetImage(annotation.ImageAnnotation!.ImgRef);
                     // Scale the annotation and draw it into the canvas using skia ScalePixels 
                     // Note: This is the primary reason we use the skia lib. PNG images are scaled without 
-                    // losing transparency. There are js solutions to do this scalingm, but they very slow
+                    // losing transparency. There are js solutions to do this scaling, but they very slow
                     // in comparision to using skia.
                     var width = annotation.AnnotationData!.Width * annotation.AnnotationData.Scale;
                     var height = annotation.AnnotationData!.Height * annotation.AnnotationData.Scale;
@@ -125,7 +124,7 @@ namespace Blazorise.AnnotatedImage
         [Parameter] public string Source { get; set; } = string.Empty;
 
         [Parameter] public Dictionary<string,IImageAnnotationData> ImageAnnotations { get; set; } = new();
-        public BoundingClientRect CanvasRect { get; private set; }
+        public BoundingClientRect? CanvasRect { get; private set; }
         public ElementReference imgRef;
         public ElementReference AnnotatedImageRef;
        
