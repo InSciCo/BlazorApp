@@ -49,7 +49,7 @@ public class JSAnnotatedImageModule : BaseJSModule
     public virtual ValueTask<string> CanvasElementToDataURL(ElementReference elementRef)
         => InvokeSafeAsync<string>("canvasElementToDataURL", elementRef);
 
-    public virtual ValueTask<BoundingClientRect>GetBoundingClientRect(ElementReference elementRef)
+    public virtual ValueTask<BoundingClientRect> GetBoundingClientRect(ElementReference elementRef)
         => InvokeSafeAsync<BoundingClientRect>("getBoundingClientRect", elementRef);
 
     public virtual ValueTask<string> GetBase64Image(ElementReference img)

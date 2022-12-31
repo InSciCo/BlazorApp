@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using SkiaSharp;
 using Blazorise.Utilities;
+using Blazorise.Extensions;
 #endregion
 
 namespace Blazorise.AnnotatedImage
@@ -44,35 +45,13 @@ namespace Blazorise.AnnotatedImage
             CanvasRect = await JSModule!.GetBoundingClientRect(imgRef);
             ImgElementHeight = CanvasRect.Height;
             ImgElementWidth = CanvasRect.Width;
-			ImgElementHeight = await JSModule!.GetImgHeight(imgRef);
-			ImgElementWidth = await JSModule!.GetImgWidth(imgRef);
         }
-        //public async Task<string> GetMergedEncodedImage()
-        //{
-
-        //    foreach (var annotation in Annotations)
-        //        await JSModule!.CreateMergeCanvas(annotation.ImageAnnotation!.ImgRef);
-        //    var imgdata = await JSModule!.GetMergeImageURL();
-        //    return imgdata;
-        //}
-        //public async Task<string> GetMergedEncodedImage()
-        //{
-        //    await JSModule!.CreateMergeCanvas(imgRef);
-        //    foreach (var annotation in Annotations)
-        //    {
-        //        await JSModule!.AddAnnotation(
-        //            annotation.ImageAnnotation!.ImgRef,
-        //            annotation.AnnotationData!.X,
-        //            annotation.AnnotationData!.Y,
-        //            annotation.AnnotationData!.Width,
-        //            annotation.AnnotationData!.Height);
-        //        var yada = await JSModule!.GetBase64Image(annotation.ImageAnnotation!.ImgRef);
-        //        Console.WriteLine(yada);
-        //    }
-        //    var imgdata = await JSModule!.GetMergeImageURL();
-        //    return imgdata;
-        //}
-
+        protected override async ValueTask DisposeAsync(bool disposing)
+        {
+            if (disposing && Rendered)
+                await JSModule.SafeDisposeAsync();
+            await base.DisposeAsync(disposing);
+        }
         private async Task<SKImage> GetImage(ElementReference imgElementReference)
         {
             var encodedString = await JSModule!.GetBase64Image(imgElementReference);
