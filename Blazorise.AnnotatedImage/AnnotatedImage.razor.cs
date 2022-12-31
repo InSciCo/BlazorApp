@@ -5,6 +5,7 @@ using Microsoft.JSInterop;
 using SkiaSharp;
 using Blazorise.Utilities;
 using Blazorise.Extensions;
+using System.Diagnostics;
 #endregion
 
 namespace Blazorise.AnnotatedImage
@@ -18,7 +19,7 @@ namespace Blazorise.AnnotatedImage
     public partial class AnnotatedImage : BaseComponent, IAsyncDisposable
     {
         #region Members 
-
+        protected Dictionary<string,Annotation> annotations = new();
         #endregion
 
         #region Methods 
@@ -34,8 +35,15 @@ namespace Blazorise.AnnotatedImage
         }
         protected async override Task OnParametersSetAsync()
         {
-            if (JSModule == null)
-                JSModule = new JSAnnotatedImageModule(JSRuntime!, VersionProvider!);
+            JSModule ??= new JSAnnotatedImageModule(JSRuntime!, VersionProvider!);
+            List<string> delList = annotations.Keys.ToList();   
+            foreach(var item in ImageAnnotations.Values)
+                if (delList.Contains(item.Id))
+                    delList.Remove(item.Id);
+                else
+                    annotations.Add(item.Id, new Annotation() { AnnotationData = item });
+            foreach (var item in delList)
+                annotations.Remove(item);
             await base.OnParametersSetAsync();
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -45,6 +53,10 @@ namespace Blazorise.AnnotatedImage
             CanvasRect = await JSModule!.GetBoundingClientRect(imgRef);
             ImgElementHeight = CanvasRect.Height;
             ImgElementWidth = CanvasRect.Width;
+        }
+        protected override async Task OnFirstAfterRenderAsync()
+        {
+            await JSModule!.Initialize();
         }
         protected override async ValueTask DisposeAsync(bool disposing)
         {
@@ -57,7 +69,6 @@ namespace Blazorise.AnnotatedImage
             var encodedString = await JSModule!.GetBase64Image(imgElementReference);
             return SKImage.FromEncodedData(Convert.FromBase64String(encodedString));
         }
-
         public async Task<string> GetMergedEncodedImage()
         {
             var backgroundImage = await GetImage(imgRef);
@@ -67,7 +78,7 @@ namespace Blazorise.AnnotatedImage
                 var canvas = surface.Canvas;
                 canvas.DrawImage(backgroundImage, new SKPoint(0, 0));
 
-                foreach (var annotation in Annotations)
+                foreach (var annotation in annotations.Values)
                 {
                     var annotationImage = await GetImage(annotation.ImageAnnotation!.ImgRef);
                     // Scale the annotation and draw it into the canvas using skia ScalePixels 
@@ -96,14 +107,6 @@ namespace Blazorise.AnnotatedImage
                 return "data:image/png;base64," + imgdata;
             }
         }
-
-        public Task AddAnnotation(IImageAnnotationData item)
-        {
-            var newAnnotation = new Annotation() { AnnotationData= item };
-            Annotations.Add(newAnnotation);
-            InvokeAsync(StateHasChanged);
-            return Task.CompletedTask;
-        }
         #endregion
 
         #region Properties 
@@ -120,7 +123,8 @@ namespace Blazorise.AnnotatedImage
         /// </summary>
         [Inject] private IVersionProvider? VersionProvider { get; set; }
         [Parameter] public string Source { get; set; } = string.Empty;
-        [Parameter] public List<Annotation> Annotations { get; set; } = new();
+
+        [Parameter] public Dictionary<string,IImageAnnotationData> ImageAnnotations { get; set; } = new();
         public BoundingClientRect CanvasRect { get; private set; }
         public ElementReference imgRef;
         public ElementReference AnnotatedImageRef;

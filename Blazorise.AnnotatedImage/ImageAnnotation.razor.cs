@@ -11,13 +11,15 @@ namespace Blazorise.AnnotatedImage;
 
 public interface IImageAnnotationData
 {
+    public string Id { get; set; }
     public double X { get; set; }
     public double Y { get; set; }
     public string Source { get; set; }
     public double Width { get; set; }
     public double Height { get; set; }
-    public string Name { get; set; }
     public double Scale { get; set; }
+    public string Name { get; set; }
+    public string Note { get; set; }
 }
 
 public enum PointerState { None, Single, Double }
@@ -56,17 +58,13 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     /// <inheritdoc/>
     protected override Task OnInitializedAsync()
     {
-        if (JSModule == null)
-            JSModule = new JSAnnotatedImageModule(JSRuntime!, VersionProvider!);
+        JSModule ??= new JSAnnotatedImageModule(JSRuntime!, VersionProvider!);
         return base.OnInitializedAsync();
     }
     /// <inheritdoc />
     protected override async Task OnFirstAfterRenderAsync()
     {
         await JSModule!.Initialize();
-        Console.WriteLine($"ImgRef:{ImgRef.Id}");
-        var yada = await JSModule!.GetBase64Image(ImgRef);
-        Console.WriteLine(yada.ToString());
     }
     /// <inheritdoc/>
     protected override async ValueTask DisposeAsync(bool disposing)
