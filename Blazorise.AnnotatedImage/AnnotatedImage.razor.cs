@@ -11,16 +11,9 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace Blazorise.AnnotatedImage
 {
-    public class Annotation
-    {
-        public IImageAnnotationData? AnnotationData { get; set; }    
-        public ImageAnnotation? ImageAnnotation { get; set; }    
-    }
-
     public partial class AnnotatedImage : BaseComponent, IAsyncDisposable
     {
         #region Members 
-        protected Dictionary<string,Annotation> annotations = new();
         protected ElementReference backgroundImageRef;
         #endregion
 
@@ -37,11 +30,13 @@ namespace Blazorise.AnnotatedImage
         protected async override Task OnParametersSetAsync()
         {
             JSModule ??= new JSAnnotatedImageModule(JSRuntime!, VersionProvider!);
-            List<string> delList = annotations.Keys.ToList();  
-            foreach(var item in ImageAnnotations.Values)
-                if(!annotations.TryAdd(item.Id, new Annotation() { AnnotationData = item }))
-                    delList.Remove(item.Id);
-            delList.ForEach(x => annotations.Remove(x));
+            //List<string> delList = Annotations.Keys.ToList();  
+            //foreach(var item in Annotations.Values)
+            //    if(delList.Contains(item.Id))
+            //        delList.Remove(item.Id);
+            //    else
+            //        Annotations.TryAdd(item.Id, new Annotation() { AnnotationData = item });
+            //delList.ForEach(x => annotations.Remove(x));
             await base.OnParametersSetAsync();
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -76,17 +71,24 @@ namespace Blazorise.AnnotatedImage
                 var canvas = surface.Canvas;
                 canvas.DrawImage(backgroundImage, new SKPoint(0, 0));
 
-                foreach (var annotation in annotations.Values)
+                foreach (var annotation in Annotations.Values.OrderBy(x => x.Order))
                 {
-                    var annotationImage = await GetImage(annotation.ImageAnnotation!.ImgRef);
+                    //var annotationImage = await GetImage(annotation.ImageAnnotation!.ImgRef);
+                    
+                    var annotationImage =
+                        SKImage.FromEncodedData(
+                            Convert.FromBase64String(
+                                await JSModule!.GetImageAnnotationDataURLById(
+                                    annotation.Id)));
+
                     // Scale the annotation and draw it into the canvas using skia ScalePixels 
                     // Note: This is the primary reason we use the skia lib. PNG images are scaled without 
                     // losing transparency. There are js solutions to do this scaling, but they very slow
                     // in comparision to using skia.
-                    var width = annotation.AnnotationData!.Width * annotation.AnnotationData.Scale;
-                    var height = annotation.AnnotationData!.Height * annotation.AnnotationData.Scale;
-                    var x = (float)(annotation.AnnotationData!.X - (width / 2));
-                    var y = (float)(annotation.AnnotationData!.Y - (height / 2));
+                    var width = annotation.Width * annotation.Scale;
+                    var height = annotation.Height * annotation.Scale;
+                    var x = (float)(annotation.X - (width / 2));
+                    var y = (float)(annotation.Y - (height / 2));
                     var x2 = (float)(x + width);
                     var y2 = (float)(y + height);
                     var sourceBitmap = SKBitmap.FromImage(annotationImage);
@@ -122,7 +124,7 @@ namespace Blazorise.AnnotatedImage
         [Inject] private IVersionProvider? VersionProvider { get; set; }
         [Parameter] public string Source { get; set; } = string.Empty;
 
-        [Parameter] public Dictionary<string,IImageAnnotationData> ImageAnnotations { get; set; } = new();
+        [Parameter] public Dictionary<string,IImageAnnotationData> Annotations { get; set; } = new();
         public BoundingClientRect? CanvasRect { get; private set; }
 
         /// <summary>

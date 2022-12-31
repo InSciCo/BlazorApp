@@ -7,13 +7,14 @@ export function setPointerCapture(element, pointerid) {
     element.setPointerCapture(pointerid);
 }
 
-
-export function getImgWidth(elm) {
-    return elm.width;
+export function getImageAnnotationDataURL(elm) {
+    var img = elm.firstChild;
+    return getBase64Image(img);
 }
 
-export function getImgHeight(elm) {
-    return elm.height;
+export function getImageAnnotationDataURLById(id) {
+    var img = document.getElementById(id).firstChild;
+    return getBase64Image(img);
 }
 
 export function canvasElementToDataURL(elm) {

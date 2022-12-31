@@ -64,6 +64,14 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     {
         await JSModule!.Initialize();
     }
+    protected override Task OnParametersSetAsync()
+    {
+        return base.OnParametersSetAsync();
+    }
+    protected override void OnAfterRender(bool firstRender)
+    {
+         base.OnAfterRender(firstRender);
+    }
     /// <inheritdoc/>
     protected override async ValueTask DisposeAsync(bool disposing)
     {
@@ -168,7 +176,7 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     /// <summary>
     /// Gets or sets the JS runtime.
     /// </summary>
-    public ElementReference ImgRef { get; private set; }    
+    // public ElementReference ImgRef { get; set; }    
     [Inject] private IJSRuntime? JSRuntime { get; set; }
     /// <summary>
     /// Gets or sets the version provider.

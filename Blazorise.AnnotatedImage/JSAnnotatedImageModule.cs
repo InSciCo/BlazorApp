@@ -40,11 +40,12 @@ public class JSAnnotatedImageModule : BaseJSModule
     public virtual ValueTask SetPointerCapture(ElementReference elementRef, long pointerId)
         => InvokeSafeVoidAsync("setPointerCapture",elementRef,pointerId);
 
-    public virtual ValueTask<int> GetImgHeight(ElementReference elementRef)
-        => InvokeSafeAsync<int>("getImgHeight",elementRef);
+    public virtual ValueTask<string> GetImageAnnotationDataURL(ElementReference elementRef)
+        => InvokeSafeAsync<string>("getImageAnnotationDataURL", elementRef);
 
-    public virtual ValueTask<int> GetImgWidth(ElementReference elementRef)
-        => InvokeSafeAsync<int>("getImgWidth", elementRef);
+    public virtual ValueTask<string> GetImageAnnotationDataURLById(string id)
+        => InvokeSafeAsync<string>("getImageAnnotationDataURLById", id);
+
 
     public virtual ValueTask<string> CanvasElementToDataURL(ElementReference elementRef)
         => InvokeSafeAsync<string>("canvasElementToDataURL", elementRef);

@@ -24,7 +24,7 @@
         @* Annotated Image *@
         <AnnotatedImage 
             @ref="@annotatedImage"
-            ImageAnnotations="@fruitItems"
+            Annotations="@fruitItems"
             Source="_content/BlazorApp/img/EmptyWeddingHall.png" />
     </Div>
     <img src="@imgdata" width="@imgwidth" height="@imgheight" />
@@ -53,15 +53,12 @@
     private Dictionary<string, IImageAnnotationData> fruitItems = new();
     private int order;
 
-    public class FruitItem
-    {
-        public string Name { get; init; }
-        public string Image { get; set; }
-    }
+
+    public record FruitItem(string Name, string Image);
     private List<FruitItem> fruits = new()
     {
-        new FruitItem() { Name = "Apple", Image = "_content/BlazorApp/img/apple.png"},
-        new FruitItem() { Name = "Bananas", Image = "_content/BlazorApp/img/bananas.png"}
+        new("Apple", "_content/BlazorApp/img/apple.png"),
+        new("Bananas", "_content/BlazorApp/img/bananas.png")
     };
     private async Task ItemSelected(MouseEventArgs args, FruitItem item)
     {
@@ -82,16 +79,14 @@
                 Width = 48,
                 Scale = 1
             });
-
+        //await InvokeAsync(StateHasChanged);
         await Task.CompletedTask;
     }
-
     private async Task Clear()
     {
         fruitItems.Clear();
         await Task.CompletedTask;
     }
-
     private async Task Reverse()
     {
         // Note: For folks that don't like to see side-effects in 
