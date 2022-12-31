@@ -83,7 +83,6 @@
                 Scale = 1
             });
 
-        //await annotatedImage!.AddAnnotation(selectedItem);
         await Task.CompletedTask;
     }
 
@@ -95,14 +94,29 @@
 
     private async Task Reverse()
     {
+        // Note: For folks that don't like to see side-effects in 
+        // linq queries, the ToList().ForEach(...) may seem objectionable.
+        // I don't buy it. Once you have list you can just do what you need
+        // to with it.
         var order = 0;
         fruitItems
             .Values
             .OrderBy(x => x.Order)
             .Select(x => x.Id)
             .Reverse()
-            .ToList()
-            .ForEach(x => fruitItems[x].Order = order++);
+            .ToList() 
+            .ForEach(id => fruitItems[id].Order = order++);
+
+        // Alternative - I do not find this easier to read
+        //foreach (var id in fruitItems
+        //    .Values
+        //    .OrderBy(x => x.Order)
+        //    .Select(x => x.Id)
+        //    .Reverse()
+        //    .ToList()
+        //    )
+        //    fruitItems[id].Order = order++;
+
         await Task.CompletedTask;
     }
 
