@@ -30,13 +30,6 @@ namespace Blazorise.AnnotatedImage
         protected async override Task OnParametersSetAsync()
         {
             JSModule ??= new JSAnnotatedImageModule(JSRuntime!, VersionProvider!);
-            //List<string> delList = Annotations.Keys.ToList();  
-            //foreach(var item in Annotations.Values)
-            //    if(delList.Contains(item.Id))
-            //        delList.Remove(item.Id);
-            //    else
-            //        Annotations.TryAdd(item.Id, new Annotation() { AnnotationData = item });
-            //delList.ForEach(x => annotations.Remove(x));
             await base.OnParametersSetAsync();
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -73,8 +66,6 @@ namespace Blazorise.AnnotatedImage
 
                 foreach (var annotation in Annotations.Values.OrderBy(x => x.Order))
                 {
-                    //var annotationImage = await GetImage(annotation.ImageAnnotation!.ImgRef);
-                    
                     var annotationImage =
                         SKImage.FromEncodedData(
                             Convert.FromBase64String(
