@@ -23,9 +23,9 @@
 
         @* Annotated Image *@
         <AnnotatedImage
-            Width="Width.Is25"
             @ref="@annotatedImage"
             Annotations="@fruitItems"
+            OnImageAnnotationMoved="ImageAnnotationMoved"
             Source="_content/BlazorApp/img/EmptyWeddingHall.png" />
     </Div>
     <img src="@imgdata" width="@imgwidth" height="@imgheight" />
@@ -54,13 +54,32 @@
     private Dictionary<string, IImageAnnotationData> fruitItems = new();
     private int order;
 
-
     public record FruitItem(string Name, string Image);
     private List<FruitItem> fruits = new()
     {
         new("Apple", "_content/BlazorApp/img/apple.png"),
         new("Bananas", "_content/BlazorApp/img/bananas.png")
     };
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRenderAsync(firstRender);
+        return Task.CompletedTask;
+    }
+
+    private Task ImageAnnotationMoved(string id)
+    {
+        if (annotatedImage is null)
+            return Task.CompletedTask;
+
+        if (!fruitItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+            return Task.CompletedTask;
+
+        var scale = fruitItem.Y / (annotatedImage.CanvasRect!.Bottom - annotatedImage.CanvasRect!.Top);
+        fruitItem.Scale = scale;
+        return Task.CompletedTask;
+    }
+
     private async Task ItemSelected(MouseEventArgs args, FruitItem item)
     {
         if (annotatedImage is null)
@@ -80,7 +99,6 @@
                 Width = 48,
                 Scale = 1
             });
-        //await InvokeAsync(StateHasChanged);
         await Task.CompletedTask;
     }
     private async Task Clear()

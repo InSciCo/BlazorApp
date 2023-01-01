@@ -30,15 +30,6 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     private double pageX;
     private double pageY;
     private bool pointerDown;
-    private long lastMoveTick;
-    //private double scale = 1.0;
-    private double scaleTop = 2.0;
-    private double scaleBottom = 0.5;
-    private double scaleIncrement = 0.25;
-    private System.Threading.Timer? timer;
-    private long timerInterval = 400; // number of msec between calls to OnTimedEvent
-    private long scaleLag = 1200; // number of msec before start of scaling
-    private bool scaling;
     private double imageHeight => ImageAnnotationData!.Scale * ImageAnnotationData.Height;
     private double imageWidth => ImageAnnotationData!.Scale * ImageAnnotationData.Width;
     private double x => ImageAnnotationData!.X - imageWidth / 2.0;
@@ -87,52 +78,22 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
         pageY = args.PageY;
         CalculateCenterOffset(args.PageX, args.PageY);
         pointerDown = true;
-        scaling = false;
-        lastMoveTick = DateTime.UtcNow.Ticks;
-        var autoEvent = new AutoResetEvent(false);
-        timer = new(OnTimedEvent!, autoEvent, scaleLag, timerInterval);
         await JSModule!.SetPointerCapture(ElementRef, args.PointerId);
     }
-    private void OnTimedEvent(Object state)
+    private async Task PointerMove(PointerEventArgs args)
     {
         if (!pointerDown || ImageAnnotationData is null)
             return;
-
-        var elapsedTime = (DateTime.UtcNow.Ticks - lastMoveTick) / 1000;
-        Console.WriteLine(elapsedTime.ToString());
-        if (!scaling && (elapsedTime < scaleLag))
-            return;
-
-        scaling = true;
-
-        ImageAnnotationData.Scale += scaleIncrement;
-
-        if (ImageAnnotationData.Scale > scaleTop)
-            ImageAnnotationData.Scale = scaleBottom;
-
-        lastMoveTick = DateTime.UtcNow.Ticks;
-        InvokeAsync(StateHasChanged);
-    }
-    private Task PointerMove(PointerEventArgs args)
-    {
-        if (!pointerDown)
-            return Task.CompletedTask;
-
-        scaling = false;
-        lastMoveTick = DateTime.UtcNow.Ticks;
-
         CalculateMovement(args.PageX, args.PageY);
+        await OnImageAnnotationMoved.InvokeAsync(ImageAnnotationData.Id);
 
-        return Task.CompletedTask;
     }
     private Task PointerUp(PointerEventArgs args)
     {
         if (!pointerDown)
             return Task.CompletedTask;
 
-        timer?.Dispose();
         pointerDown = false;
-        scaling = false;
 
         CalculateMovement(args.PageX, args.PageY);
 
@@ -196,7 +157,11 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     [Parameter] public bool Fluid { get; set; }
 
     [Parameter] public IImageAnnotationData? ImageAnnotationData { get; set; } 
-    [Parameter] public BoundingClientRect? CanvasRect { get; set; }  
+    [Parameter] public BoundingClientRect? CanvasRect { get; set; }
+    [Parameter] public EventCallback<string> OnImageAnnotationMoved { get; set; }
+    [Parameter] public EventCallback<string> OnImageAnnotationSelected { get; set; }
+    [Parameter] public EventCallback<string> OnImageAnnotationUnselected { get; set; }
+    [Parameter] public EventCallback<string> OnImageAnnotationOpen { get; set; }
 
     #endregion
 

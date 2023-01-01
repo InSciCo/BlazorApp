@@ -6,7 +6,7 @@ using SkiaSharp;
 using Blazorise.Utilities;
 using Blazorise.Extensions;
 using System.Diagnostics;
-using System.Reflection.Metadata.Ecma335;
+using System.Reflection.Metadata.Ecma335; 
 #endregion
 
 namespace Blazorise.AnnotatedImage
@@ -98,6 +98,11 @@ namespace Blazorise.AnnotatedImage
                 return "data:image/png;base64," + imgdata;
             }
         }
+        // Perculate from ImageAnnotation to parent of AnnotatedImage
+        protected async Task ImageAnnotationMoved(string id)
+        {
+            await OnImageAnnotationMoved.InvokeAsync(id);   
+        }
         #endregion
 
         #region Properties 
@@ -117,6 +122,7 @@ namespace Blazorise.AnnotatedImage
 
         [Parameter] public Dictionary<string,IImageAnnotationData> Annotations { get; set; } = new();
         public BoundingClientRect? CanvasRect { get; private set; }
+        [Parameter] public EventCallback<string> OnImageAnnotationMoved { get; set; }
 
         /// <summary>
         /// Width of original image
