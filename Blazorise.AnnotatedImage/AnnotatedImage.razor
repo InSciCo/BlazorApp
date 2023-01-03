@@ -10,14 +10,17 @@
         @ref="backgroundImageRef" 
         src="@Source">
     </img>
-    @foreach(var item in Annotations.Values.OrderBy(x => x.Order))
+    @foreach (var item in Annotations.Values)
     {
         <ImageAnnotation 
             ElementId="@item.Id"
             ImageAnnotationData="@item"
+            OnImageAnnotationSelected="ImageAnnotationSelected"
+            OnImageAnnotationStartMove="ImageAnnotationStartMove"
             OnImageAnnotationMoved="ImageAnnotationMoved"
+            OnImageAnnotationEndMove="ImageAnnotationEndMove"
+            OnImageAnnotationUnselected="ImageAnnotationUnselected"
             CanvasRect="@CanvasRect"/>
     }
 </div>
-
 

@@ -11,6 +11,8 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace Blazorise.AnnotatedImage
 {
+
+
     public partial class AnnotatedImage : BaseComponent, IAsyncDisposable
     {
         #region Members 
@@ -66,6 +68,7 @@ namespace Blazorise.AnnotatedImage
 
                 foreach (var annotation in Annotations.Values.OrderBy(x => x.Order))
                 {
+                    Console.WriteLine($"Order:{annotation.Order}");
                     var annotationImage =
                         SKImage.FromEncodedData(
                             Convert.FromBase64String(
@@ -98,11 +101,18 @@ namespace Blazorise.AnnotatedImage
                 return "data:image/png;base64," + imgdata;
             }
         }
-        // Perculate from ImageAnnotation to parent of AnnotatedImage
-        protected async Task ImageAnnotationMoved(string id)
+        // Perculate from ImageAnnotation event to parent of AnnotatedImage
+        protected async Task ImageAnnotationSelected(string id)
         {
-            await OnImageAnnotationMoved.InvokeAsync(id);   
+            if (!MultiSelect)
+                foreach (var item in Annotations.Values.Where(x => x.Id != id))
+                    item.Selected = false;
+            await OnImageAnnotationSelected.InvokeAsync(id);
         }
+        protected async Task ImageAnnotationStartMove(string id) => await OnImageAnnotationStartMove.InvokeAsync(id);
+        protected async Task ImageAnnotationMoved(string id) => await OnImageAnnotationMoved.InvokeAsync(id);
+        protected async Task ImageAnnotationEndMove(string id) => await OnImageAnnotationEndMove.InvokeAsync(id);
+        protected async Task ImageAnnotationUnselected(string id) => await OnImageAnnotationUnselected.InvokeAsync(id);
         #endregion
 
         #region Properties 
@@ -118,11 +128,16 @@ namespace Blazorise.AnnotatedImage
         /// Gets or sets the version provider.
         /// </summary>
         [Inject] private IVersionProvider? VersionProvider { get; set; }
-        [Parameter] public string Source { get; set; } = string.Empty;
-
-        [Parameter] public Dictionary<string,IImageAnnotationData> Annotations { get; set; } = new();
         public BoundingClientRect? CanvasRect { get; private set; }
+
+        [Parameter] public string Source { get; set; } = string.Empty;
+        [Parameter] public bool MultiSelect { get; set; }
+        [Parameter] public Dictionary<string,IImageAnnotationData> Annotations { get; set; } = new();
+        [Parameter] public EventCallback<string> OnImageAnnotationSelected { get; set; }
+        [Parameter] public EventCallback<string> OnImageAnnotationStartMove { get; set; }
         [Parameter] public EventCallback<string> OnImageAnnotationMoved { get; set; }
+        [Parameter] public EventCallback<string> OnImageAnnotationEndMove { get; set; }
+        [Parameter] public EventCallback<string> OnImageAnnotationUnselected { get; set; }
 
         /// <summary>
         /// Width of original image

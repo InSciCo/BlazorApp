@@ -14,38 +14,35 @@
                         <FigureImage Source="@item.Image" draggable="false" />
                         <FigureCaption>@item.Name</FigureCaption>
                     </Figure>
-                </Button>
+                </Button> 
             }
-            <Button Color="Color.Primary" Clicked="Merge">Merge</Button>
-            <Button Color="Color.Primary" Clicked="Reverse">Reverse</Button>
-            <Button Color="Color.Primary" Clicked="Clear">Clear</Button>
+            <Button Border="Border.Is2" Color="Color.Primary" Clicked="Merge">Merge</Button>
+            <Button Border="Border.Is2" Color="Color.Primary" Clicked="Clear">Clear</Button>
+            <Button Border="Border.Is2" Color="Color.Primary" Clicked="ReadSample">Read</Button>
         </Div>
 
         @* Annotated Image *@
         <AnnotatedImage
             @ref="@annotatedImage"
             Annotations="@fruitItems"
+            OnImageAnnotationSelected="ImageAnnotationSelected"
+            OnImageAnnotationStartMove="ImageAnnotationStartMove"
             OnImageAnnotationMoved="ImageAnnotationMoved"
+            OnImageAnnotationEndMove="ImageAnnotationEndMove"
+            OnImageAnnotationUnselected="ImageAnnotationUnSelected"
             Source="_content/BlazorApp/img/EmptyWeddingHall.png" />
     </Div>
+    @foreach(var item in fruitItems.Values)
+    {
+        <p>@item.Name @item.Y @item.Order</p>
+    }
+    <input type="text" 
+
     <img src="@imgdata" width="@imgwidth" height="@imgheight" />
+    <p> "Yada:" @yada</p>
 </Div>
 
 @code {
-
-    public class SelectedFruitItem : IImageAnnotationData
-    {
-        public string Id { get; set; } = string.Empty;
-        public int Order { get; set; }
-        public double X { get; set; }
-        public double Y { get; set; }
-        public string Source { get; set; } = string.Empty;
-        public double Width { get; set; }
-        public double Height { get; set; }
-        public double Scale { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Note { get; set; } = string.Empty;
-    }
 
     private AnnotatedImage? annotatedImage;
     private string imgdata = string.Empty;
@@ -53,21 +50,54 @@
     private double imgheight;
     private Dictionary<string, IImageAnnotationData> fruitItems = new();
     private int order;
+    private string yada = string.Empty;
 
-    public record FruitItem(string Name, string Image);
-    private List<FruitItem> fruits = new()
+    [Inject] IContentAccess? ContentAccess { get; set; }
+
+    public record SceenItemStore(string Name, string Image);
+    private List<SceenItemStore> fruits = new()
     {
         new("Apple", "_content/BlazorApp/img/apple.png"),
         new("Bananas", "_content/BlazorApp/img/bananas.png")
     };
-
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         base.OnAfterRenderAsync(firstRender);
         return Task.CompletedTask;
     }
 
-    private Task ImageAnnotationMoved(string id)
+    private async Task ReadSample()
+    {
+        yada = await ContentAccess!.ReadJson("_content/BlazorApp/data/SceneItems.json");
+    }
+     
+    private async Task ItemSelected(MouseEventArgs args, SceenItemStore item)
+    {
+        if (annotatedImage is null)
+            return;
+        var imageWidth = annotatedImage.ImgElementWidth;
+        var imageHeight = annotatedImage.ImgElementHeight;
+        var id = Guid.NewGuid().ToString();
+
+        var fruitItem = new ImageAnnotationData()
+            {
+                Id = id,
+                Name = item.Name,
+                Source = item.Image,
+                X = imageWidth / 2,
+                Y = imageHeight / 2,
+                Order = 0,
+                Height = 48,
+                Width = 48
+            };
+        fruitItem.Scale = CalculateScale(fruitItem);
+        fruitItems.Add(id, fruitItem);
+
+        SetOrder();
+        await Task.CompletedTask;
+    }
+
+    private Task ImageAnnotationSelected(string id)
     {
         if (annotatedImage is null)
             return Task.CompletedTask;
@@ -75,62 +105,95 @@
         if (!fruitItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
             return Task.CompletedTask;
 
-        var scale = fruitItem.Y / (annotatedImage.CanvasRect!.Bottom - annotatedImage.CanvasRect!.Top);
-        fruitItem.Scale = scale;
+        // Console.WriteLine($"Selected:{id}");
         return Task.CompletedTask;
     }
 
-    private async Task ItemSelected(MouseEventArgs args, FruitItem item)
+    private Task ImageAnnotationStartMove(string id)
+    {
+        if (annotatedImage is null)
+            return Task.CompletedTask;
+
+        if (!fruitItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+            return Task.CompletedTask;
+        //Console.WriteLine($"StartMove:{id}");
+        return Task.CompletedTask;
+    }
+
+
+    private async Task ImageAnnotationMoved(string id)
     {
         if (annotatedImage is null)
             return;
-        var imageWidth = annotatedImage.ImgElementWidth;
-        var imageHeight = annotatedImage.ImgElementHeight;
-        var id = Guid.NewGuid().ToString();
-        fruitItems.Add(id, new SelectedFruitItem()
-            {
-                Id = id,
-                Order = order++,
-                Name = item.Name,
-                Source = item.Image,
-                X = imageWidth / 2,
-                Y = imageHeight / 2,
-                Height = 48,
-                Width = 48,
-                Scale = 1
-            });
-        await Task.CompletedTask;
+
+        if (!fruitItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+            return;
+        //Console.WriteLine($"Moved:{id}");
+
+        fruitItem.Scale = CalculateScale(fruitItem);
+        if (SetOrder())
+            await InvokeAsync(StateHasChanged);
+        return;
     }
+
+    private async Task ImageAnnotationEndMove(string id)
+    {
+        if (annotatedImage is null)
+            return;
+
+        if (!fruitItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+            return;
+
+        //Console.WriteLine($"EndMove:{id}");
+        if (SetOrder())
+            await InvokeAsync(StateHasChanged);
+        return;
+    }
+
+    private async Task ImageAnnotationUnSelected(string id)
+    {
+        if (annotatedImage is null)
+            return;
+
+        if (!fruitItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+            return;
+
+        //Console.WriteLine($"Unselected:{id}");
+        if (SetOrder())
+            await InvokeAsync(StateHasChanged);
+        return;
+    }
+
+    private double CalculateScale(IImageAnnotationData annotation)
+    {
+        if (annotatedImage is null)
+            return 0.5;
+
+        return 0.25 + (0.75 * annotation.Y / (annotatedImage.CanvasRect!.Bottom - annotatedImage.CanvasRect!.Top));
+    }
+    private bool SetOrder()
+    {
+        var items = fruitItems.Values.OrderBy(x => x.Y).ToList(); 
+        int order = 0;
+        var changed = false;
+        foreach (var item in items)
+        {
+            if(item.Order != order)
+            {
+                Console.WriteLine($"order:{item.Order} {order}");
+                item.Order = order;
+                changed = true;
+            }
+            order++;
+        }
+        //if (changed)
+        //    Console.WriteLine("OrderChanged");
+        return changed;
+    }
+
     private async Task Clear()
     {
         fruitItems.Clear();
-        await Task.CompletedTask;
-    }
-    private async Task Reverse()
-    {
-        // Note: For folks that don't like to see side-effects in 
-        // linq queries, the ToList().ForEach(...) may seem objectionable.
-        // I don't buy it. Once you have list you can just do what you need
-        // to with it.
-        var order = 0;
-        fruitItems
-            .Values
-            .OrderBy(x => x.Order)
-            .Select(x => x.Id)
-            .Reverse()
-            .ToList() 
-            .ForEach(id => fruitItems[id].Order = order++);
-
-        // Alternative - I do not find this easier to read
-        //foreach (var id in fruitItems
-        //    .Values
-        //    .OrderBy(x => x.Order)
-        //    .Select(x => x.Id)
-        //    .Reverse()
-        //    .ToList()
-        //    )
-        //    fruitItems[id].Order = order++;
-
         await Task.CompletedTask;
     }
 

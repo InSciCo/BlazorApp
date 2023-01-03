@@ -21,6 +21,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
+		<PackageReference Include="Blazor3D" Version="0.1.24" />
 		<PackageReference Include="Blazorise.Animate" Version="1.1.4.1" />
 		<PackageReference Include="Blazorise.Bootstrap5" Version="1.1.4.1" />
 		<PackageReference Include="Blazorise.Components" Version="1.1.4.1" />
