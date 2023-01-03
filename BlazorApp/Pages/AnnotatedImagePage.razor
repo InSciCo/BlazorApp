@@ -1,6 +1,7 @@
 ﻿@namespace BlazorApp 
 @page "/annotatedimage"
 @inject IJSRuntime JSRuntime 
+
 <h3>AnnotatedImagePage</h3>
 
 <Div Flex="Flex.Column">
@@ -69,6 +70,7 @@
     private async Task ReadSample()
     {
         yada = await ContentAccess!.ReadJson("_content/BlazorApp/data/SceneItems.json");
+        var sceneItems = JsonConvert.DeserializeObject<List<SceneItem>>(yada);
     }
      
     private async Task ItemSelected(MouseEventArgs args, SceenItemStore item)
@@ -119,7 +121,6 @@
         //Console.WriteLine($"StartMove:{id}");
         return Task.CompletedTask;
     }
-
 
     private async Task ImageAnnotationMoved(string id)
     {
