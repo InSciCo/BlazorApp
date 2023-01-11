@@ -59,10 +59,15 @@
         new("Apple", "_content/BlazorApp/img/apple.png"),
         new("Bananas", "_content/BlazorApp/img/bananas.png")
     };
-    protected override Task OnAfterRenderAsync(bool firstRender)
+    //protected override Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    base.OnAfterRenderAsync(firstRender);
+    //    return Task.CompletedTask;
+    //}
+    protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        base.OnAfterRenderAsync(firstRender);
-        return Task.CompletedTask;
+        await ReadSample();
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task ReadSample()
