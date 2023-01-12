@@ -12,10 +12,10 @@
             {
                 @foreach (var item in SceneItemStore) @*scene item buttons*@
                 {
-                    <Button Clicked="@((args) => ItemSelected(args,@item.Value))" draggable="false">
+                    <Button Clicked="@((args) => ItemSelected(args,@item))" draggable="false">
                         <Figure draggable="false">
-                            <FigureImage Source="@item.Value.ImageURL" draggable="false" />
-                            <FigureCaption>@item.Value.Name</FigureCaption>
+                            <FigureImage Source="@item.ImageURL" draggable="false" />
+                            <FigureCaption>@item.Name</FigureCaption>
                         </Figure>
                     </Button> 
                 }
@@ -53,7 +53,7 @@
     private int order;
     private string yada = string.Empty;
     private SceneGraph? SceneGraph;
-    private Dictionary<string, SceneItem>? SceneItemStore;
+    private List<SceneItem>? SceneItemStore;
     // TJ private Dictionary<String,SceneItem>? SceneItems;
 
     [Inject] IContentAccess? ContentAccess { get; set; }
@@ -82,7 +82,7 @@
             SceneGraph = JsonConvert.DeserializeObject<SceneGraph>(
                 await ContentAccess!.ReadJson("_content/BlazorApp/data/SceneGraph.json")
             );
-            SceneItemStore = JsonConvert.DeserializeObject<Dictionary<string, SceneItem>>(
+            SceneItemStore = JsonConvert.DeserializeObject<List<SceneItem>>(
                 await ContentAccess!.ReadJson("_content/BlazorApp/data/SceneItems.json")
             );
         }
