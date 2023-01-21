@@ -55,6 +55,17 @@
     private SceneGraph? SceneGraph;
     private List<SceneItem>? SceneItemStore;
     // TJ private Dictionary<String,SceneItem>? SceneItems;
+    private double? SceneGraph_xmax;
+    private double? SceneGraph_xmin;
+    private double? SceneGraph_ymax;
+    private double? SceneGraph_ymin;
+    private double? SceneGraph_zmax;
+    private double? SceneGraph_zmin;
+    private double DeviceCameraFOV = 1.9722; //113.0
+    private double UserEnteredCameraHeight = 5.5;
+    private double UserEnteredWallDistanceInFeet = 5.5;
+    private double? BackgroundSceneHeightWidthRatio;
+    private double? BaseboardHeightAsPercentOfBackgroundHeight;
 
     [Inject] IContentAccess? ContentAccess { get; set; }
 
@@ -72,7 +83,22 @@
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         await ReadSample();
+        await UpdateSceneGraph();
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task UpdateSceneGraph()
+    {
+        //imagewidthinfeet = Tan(fov/2)((CameraHeight ^ 2 + CameraDistance ^ 2) ^ 1 / 2)
+        await Task.Run(() =>
+        {
+            var a = Math.Tan(DeviceCameraFOV / 2);
+            var b = Math.Pow(UserEnteredCameraHeight, 2);
+            var c = Math.Pow(UserEnteredWallDistanceInFeet, 2);
+            var d = b + c;
+            var e = Math.Sqrt(d);
+            SceneGraph_ymax = a * e;
+        });
     }
 
     private async Task ReadSample()
