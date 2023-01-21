@@ -55,12 +55,12 @@
     private SceneGraph? SceneGraph;
     private List<SceneItem>? SceneItemStore;
     // TJ private Dictionary<String,SceneItem>? SceneItems;
-    private double? SceneGraph_xmax;
+    private double? SceneGraph_xmax = 0.0;
     private double? SceneGraph_xmin;
     private double? SceneGraph_ymax;
     private double? SceneGraph_ymin;
     private double? SceneGraph_zmax;
-    private double? SceneGraph_zmin;
+    private double? SceneGraph_zmin = 0.0;
     private double DeviceCameraFOV = 1.9722; //113.0
     private double UserEnteredCameraHeight = 5.5;
     private double UserEnteredWallDistanceInFeet = 5.5;
@@ -98,6 +98,9 @@
             var d = b + c;
             var e = Math.Sqrt(d);
             SceneGraph_ymax = a * e;
+            SceneGraph_ymin = -SceneGraph_ymax;
+            SceneGraph_xmin = UserEnteredWallDistanceInFeet;
+            SceneGraph_zmax = UserEnteredCameraHeight;
         });
     }
 

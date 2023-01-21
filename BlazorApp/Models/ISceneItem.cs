@@ -9,5 +9,9 @@
         ScenePos ScenePos { get; set; }
         double Width { get; set; }
 
+        bool Equals(object? obj);
+        bool Equals(SceneItem? other);
+        int GetHashCode();
+        string ToString();
     }
 }
