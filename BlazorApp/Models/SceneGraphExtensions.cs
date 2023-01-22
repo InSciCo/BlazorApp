@@ -15,7 +15,7 @@ public static class SceneGraphExtensions
             || !annotatedImage.Annotations.TryGetValue(id, out IImageAnnotationData? annotationData))
             return;
 
-        annotationData.X = sceneItem.ScenePos.X;
+        annotationData.X = sceneItem.ScenePos.X; //scene item plus
         annotationData.Y = sceneItem.ScenePos.Y;
     }
     public static void AnnotationToScene(this SceneGraph sceneGraph, string id, AnnotatedImage annotatedImage)
