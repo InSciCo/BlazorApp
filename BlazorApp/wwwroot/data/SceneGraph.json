@@ -4,29 +4,5 @@
   "Depth": 20,
   "CameraHeight": 5.5,
   "SceneItems": {
-    "fce9bcff-bb6a-4a4f-80c2-6d14f1fa2d2d": {
-      "Name": "Apple",
-      "ImageURL": "_content/BlazorApp/img/apple.png",
-      "Width": 48,
-      "Height": 48,
-      "HeightOffFloor": 0,
-      "ScenePos": {
-        "X": 100,
-        "Y": 200,
-        "Z": 0
-      }
-    },
-    "fce9bcff-bb6a-4a4f-80c2-6d14f1fa2d2c": {
-      "Name": "Bananas",
-      "ImageURL": "_content/BlazorApp/img/bananas.png",
-      "Width": 48,
-      "Height": 48,
-      "HeightOffFloor": 0,
-      "ScenePos": {
-        "X": 50,
-        "Y": 50,
-        "Z": 0
-      }
-    }
   }
 }
