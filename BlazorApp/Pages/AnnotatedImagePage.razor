@@ -26,7 +26,7 @@
         </Div>
         <AnnotatedImage
             @ref="@annotatedImage"
-            Annotations="@SceneItems"
+            Annotations="@SceneGraph?.SceneItems"
             OnImageAnnotationSelected="ImageAnnotationSelected"
             OnImageAnnotationStartMove="ImageAnnotationStartMove"
             OnImageAnnotationMoved="ImageAnnotationMoved"
@@ -35,10 +35,10 @@
             Source="_content/BlazorApp/img/EmptyWeddingHall.png"
         />
     </Div>
-    @foreach(var item in SceneItems.Values) @*render SceneItems*@
+    @*    @foreach(var item in SceneItems.Values) @*render SceneItems
     {
-        <p>@item.Name @item.Y @item.Order</p>
-    }
+    <p>@item.Name @item.Y @item.Order</p>
+    }*@
     <img src="@imgdata" width="@imgwidth" height="@imgheight" />
     <p> "Yada:" @yada</p>
 </Div>
@@ -49,10 +49,10 @@
     private string imgdata = string.Empty;
     private double imgwidth;
     private double imgheight;
-    private Dictionary<string, IImageAnnotationData> SceneItems = new();
+    //private Dictionary<string, IImageAnnotationData> SceneItems = new();
     private int order;
     private string yada = string.Empty;
-    private SceneGraphPlus? SceneGraph;
+    private ISceneGraphPlus? SceneGraph;
     private List<SceneItem>? SceneItemStore;
     private string SceneItemSelectedId;
 
@@ -106,7 +106,7 @@
             var id = Guid.NewGuid().ToString();
             SceneItemSelectedId = id;
 
-            var sceneItem = new ImageAnnotationData()
+            var sceneItem = new SceneItemPlus()
                 {
                     Id = id,
                     Name = item.Name,
@@ -118,7 +118,7 @@
                     Width = 48
                 };
             sceneItem.Scale = CalculateScale(sceneItem);
-            SceneItems.Add(id, sceneItem);
+            SceneGraph.SceneItems.Add(id, sceneItem);
         }
         catch (Exception e)
         {
@@ -133,7 +133,7 @@
         if (annotatedImage is null)
             return Task.CompletedTask;
 
-        if (!SceneItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+        if (!SceneGraph.SceneItems.TryGetValue(id, out SceneItemPlus? fruitItem))
             return Task.CompletedTask;
 
         // Console.WriteLine($"Selected:{id}");
@@ -145,7 +145,7 @@
         if (annotatedImage is null)
             return Task.CompletedTask;
 
-        if (!SceneItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+        if (!SceneGraph.SceneItems.TryGetValue(id, out SceneItemPlus? fruitItem))
             return Task.CompletedTask;
         //Console.WriteLine($"StartMove:{id}");
         return Task.CompletedTask;
@@ -156,7 +156,7 @@
         if (annotatedImage is null)
             return;
 
-        if (!SceneItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+        if (!SceneGraph.SceneItems.TryGetValue(id, out SceneItemPlus? fruitItem))
             return;
         //Console.WriteLine($"Moved:{id}");
 
@@ -171,7 +171,7 @@
         if (annotatedImage is null)
             return;
 
-        if (!SceneItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+        if (!SceneGraph.SceneItems.TryGetValue(id, out SceneItemPlus? fruitItem))
             return;
 
         //Console.WriteLine($"EndMove:{id}");
@@ -185,7 +185,7 @@
         if (annotatedImage is null)
             return;
 
-        if (!SceneItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+        if (!SceneGraph.SceneItems.TryGetValue(id, out SceneItemPlus? fruitItem))
             return;
 
         //Console.WriteLine($"Unselected:{id}");
@@ -203,7 +203,7 @@
     }
     private bool SetOrder()
     {
-        var items = SceneItems.Values.OrderBy(x => x.Y).ToList(); 
+        var items = SceneGraph.SceneItems.Values.OrderBy(x => x.Y).ToList(); 
         int order = 0;
         var changed = false;
         foreach (var item in items)
@@ -223,7 +223,7 @@
 
     private async Task Clear()
     {
-        SceneItems.Clear();
+        SceneGraph.SceneItems.Clear();
         await Task.CompletedTask;
     }
 

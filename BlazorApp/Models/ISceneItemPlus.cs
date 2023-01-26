@@ -1,6 +1,8 @@
-﻿namespace BlazorApp
+﻿using Blazorise.AnnotatedImage;
+
+namespace BlazorApp
 {
-    public interface ISceneItemPlus
+    public interface ISceneItemPlus : ISceneItem, IImageAnnotationData
     {
         double Height { get; set; }
         double HeightOffFloor { get; set; }

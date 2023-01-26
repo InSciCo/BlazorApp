@@ -7,7 +7,7 @@ using static BlazorApp.AnnotatedImagePage;
 
 namespace BlazorApp;
 
-public record SceneItem : ISceneItem
+public class SceneItem : ISceneItem
 {
     public string Name { get; set; }
     public string? Note { get; set; }
@@ -29,4 +29,9 @@ public record SceneItem : ISceneItem
     /// Position of center of object in Scene
     /// </summary>
     public ScenePos ScenePos { get; set; }
+
+    public bool Equals(SceneItem? other)
+    {
+        throw new NotImplementedException();
+    }
 }

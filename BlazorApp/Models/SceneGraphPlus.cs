@@ -14,4 +14,5 @@ public class SceneGraphPlus : ISceneGraphPlus
     public double ImageRatio { get; set; } // 16:9 etc. 
     public string ImageURL { get; set; }
     public Dictionary<string, ISceneItemPlus> SceneItems { get; set; } = new();
+   // Dictionary<string, ISceneItem> SceneItems2 { get; set; } = new();
 }

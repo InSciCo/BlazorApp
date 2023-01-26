@@ -8,7 +8,7 @@ using static BlazorApp.AnnotatedImagePage;
 
 namespace BlazorApp;
 
-public record SceneItemPlus : ISceneItem, IImageAnnotationData, ISceneItemPlus
+public class SceneItemPlus : ISceneItemPlus
 {
     public string Name { get; set; }
     public string? Note { get; set; }
@@ -41,6 +41,10 @@ public record SceneItemPlus : ISceneItem, IImageAnnotationData, ISceneItemPlus
     public bool Selected { get; set; }
 
     public bool Equals(SceneItem? other)
+    {
+        throw new NotImplementedException();
+    }
+    public bool Equals(SceneItemPlus? other)
     {
         throw new NotImplementedException();
     }
