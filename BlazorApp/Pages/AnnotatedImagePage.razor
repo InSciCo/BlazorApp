@@ -52,7 +52,7 @@
     private Dictionary<string, IImageAnnotationData> SceneItems = new();
     private int order;
     private string yada = string.Empty;
-    private SceneGraph? SceneGraph;
+    private SceneGraphPlus? SceneGraph;
     private List<SceneItem>? SceneItemStore;
     private string SceneItemSelectedId;
 
@@ -73,27 +73,17 @@
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         await ReadSample();
-        await UpdateSceneGraph(); //to move
         await base.OnAfterRenderAsync(firstRender);
-    }
-
-    private async Task UpdateSceneGraph()
-    {
-        //imagewidthinfeet = Tan(fov/2)((CameraHeight ^ 2 + CameraDistance ^ 2) ^ 1 / 2)
-        await Task.Run(() =>
-        {
-            if (SceneItemSelectedId != null)
-                SceneGraph.SceneItems[SceneItemSelectedId].ScenePos.X = 1.0;
-        });
     }
 
     private async Task ReadSample()
     {
         try
         {
-            SceneGraph = JsonConvert.DeserializeObject<SceneGraph>(
+            SceneGraph = JsonConvert.DeserializeObject<SceneGraphPlus>(
                 await ContentAccess!.ReadJson("_content/BlazorApp/data/SceneGraph.json")
             );
+            
             SceneItemStore = JsonConvert.DeserializeObject<List<SceneItem>>(
                 await ContentAccess!.ReadJson("_content/BlazorApp/data/SceneItems.json")
             );

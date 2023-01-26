@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Blazorise.AnnotatedImage;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using static BlazorApp.AnnotatedImagePage;
 
 namespace BlazorApp;
 
-public record SceneItem : ISceneItem
+public record SceneItemPlus : ISceneItem, IImageAnnotationData, ISceneItemPlus
 {
     public string Name { get; set; }
     public string? Note { get; set; }
@@ -29,4 +30,18 @@ public record SceneItem : ISceneItem
     /// Position of center of object in Scene
     /// </summary>
     public ScenePos ScenePos { get; set; }
+
+    //rednering info
+    public string? Id { get; set; }
+    public double Order { get; set; }
+    public double Scale { get; set; }
+    public string? Source { get; set; }
+    public double X { get; set; }
+    public double Y { get; set; }
+    public bool Selected { get; set; }
+
+    public bool Equals(SceneItem? other)
+    {
+        throw new NotImplementedException();
+    }
 }

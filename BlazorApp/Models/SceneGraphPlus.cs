@@ -7,11 +7,11 @@ using static BlazorApp.AnnotatedImagePage;
 
 namespace BlazorApp;
 
-public class SceneGraph : ISceneGraph
+public class SceneGraphPlus : ISceneGraphPlus
 {
     public double CameraHeight { get; set; }
     public double Depth { get; set; } // Distance Camera to back wall
-    public double ImageRatio { get; set; } // 16:9 etc
+    public double ImageRatio { get; set; } // 16:9 etc. 
     public string ImageURL { get; set; }
-    public Dictionary<string, ISceneItem> SceneItems { get; set; } = new();
+    public Dictionary<string, ISceneItemPlus> SceneItems { get; set; } = new();
 }

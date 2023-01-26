@@ -11,7 +11,7 @@ public static class SceneGraphExtensions
 {
     public static void SceneToAnnotation(this SceneGraph sceneGraph, string id, AnnotatedImage annotatedImage)
     {
-        if (!sceneGraph.SceneItems.TryGetValue(id, out SceneItem? sceneItem)
+        if (!sceneGraph.SceneItems.TryGetValue(id, out ISceneItem? sceneItem)
             || !annotatedImage.Annotations.TryGetValue(id, out IImageAnnotationData? annotationData))
             return;
 
@@ -20,11 +20,11 @@ public static class SceneGraphExtensions
     }
     public static void AnnotationToScene(this SceneGraph sceneGraph, string id, AnnotatedImage annotatedImage)
     {
-        if (!sceneGraph.SceneItems.TryGetValue(id, out SceneItem? sceneItem)
+        if (!sceneGraph.SceneItems.TryGetValue(id, out ISceneItem? sceneItem)
             || !annotatedImage.Annotations.TryGetValue(id, out IImageAnnotationData? annotationData))
             return;
 
         sceneItem.ScenePos.X = annotationData.X;
-        sceneItem.ScenePos.Y = annotationData.Y;    
+        sceneItem.ScenePos.Y = annotationData.Y;   
     }
 } 
