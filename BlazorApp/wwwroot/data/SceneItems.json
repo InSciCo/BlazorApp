@@ -1,7 +1,7 @@
 [
   {
     "Name": "Apple",
-    "ImageURL": "_content/BlazorApp/img/apple.png",
+    "Source": "_content/BlazorApp/img/apple.png",
     "Width": 48,
     "Height": 48,
     "HeightOffFloor": 0,
@@ -13,7 +13,7 @@
   },
   {
     "Name": "Bananas",
-    "ImageURL": "_content/BlazorApp/img/bananas.png",
+    "Source": "_content/BlazorApp/img/bananas.png",
     "Width": 48,
     "Height": 48,
     "HeightOffFloor": 0,

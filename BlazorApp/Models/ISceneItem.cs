@@ -1,17 +1,11 @@
-﻿namespace BlazorApp
-{
-    public interface ISceneItem
-    {
-        double Height { get; set; }
-        double HeightOffFloor { get; set; }
-        string ImageURL { get; set; }
-        string Name { get; set; }
-        ScenePos ScenePos { get; set; }
-        double Width { get; set; }
+﻿using Blazorise.AnnotatedImage;
 
-        bool Equals(object? obj);
-        bool Equals(SceneItem? other);
-        int GetHashCode();
-        string ToString();
+namespace BlazorApp
+{
+    public interface ISceneItem : IImageAnnotationData
+    {
+        double HeightOffFloor { get; set; }
+        ScenePos ScenePos { get; set; }
+
     }
 }

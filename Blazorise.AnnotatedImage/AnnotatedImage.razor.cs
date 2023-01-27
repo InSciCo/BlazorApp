@@ -73,7 +73,7 @@ namespace Blazorise.AnnotatedImage
                         SKImage.FromEncodedData(
                             Convert.FromBase64String(
                                 await JSModule!.GetImageAnnotationDataURLById(
-                                    annotation.Id)));
+                                    annotation.Id!)));
 
                     // Scale the annotation and draw it into the canvas using skia ScalePixels 
                     // Note: This is the primary reason we use the skia lib. PNG images are scaled without 

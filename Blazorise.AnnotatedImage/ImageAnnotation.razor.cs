@@ -11,14 +11,14 @@ namespace Blazorise.AnnotatedImage;
 
 public interface IImageAnnotationData
 {
-    double Height { get; set; }
     string? Id { get; set; }
     string Name { get; set; }
-    string? Note { get; set; }
+    string Note { get; set; }
     double Order { get; set; }
     double Scale { get; set; }
-    string? Source { get; set; }
+    string Source { get; set; }
     double Width { get; set; }
+    double Height { get; set; }
     double X { get; set; }
     double Y { get; set; }
     bool Selected { get; set; }
@@ -27,15 +27,15 @@ public interface IImageAnnotationData
 public class ImageAnnotationData : IImageAnnotationData
 {
     public string? Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Note { get; set; } = string.Empty;
     public double Order { get; set; }
-    public double X { get; set; }
-    public double Y { get; set; }
-    public string? Source { get; set; } = string.Empty;
+    public double Scale { get; set; }
+    public string Source { get; set; } = string.Empty;
     public double Width { get; set; }
     public double Height { get; set; }
-    public double Scale { get; set; }
-    public string? Name { get; set; } = string.Empty;
-    public string? Note { get; set; } = string.Empty;
+    public double X { get; set; }
+    public double Y { get; set; }
     public bool Selected { get; set; }  
 }
 

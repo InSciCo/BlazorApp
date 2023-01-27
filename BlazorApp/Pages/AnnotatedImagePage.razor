@@ -14,7 +14,7 @@
                 {
                     <Button Clicked="@((args) => ItemSelected(args,@item))" draggable="false">
                         <Figure draggable="false">
-                            <FigureImage Source="@item.ImageURL" draggable="false" />
+                            <FigureImage Source="@item.Source" draggable="false" />
                             <FigureCaption>@item.Name</FigureCaption>
                         </Figure>
                     </Button> 
@@ -52,9 +52,10 @@
     //private Dictionary<string, IImageAnnotationData> SceneItems = new();
     private int order;
     private string yada = string.Empty;
-    private ISceneGraphPlus? SceneGraph;
+    private ISceneGraph? SceneGraph;
+    //private List<SceneItem>? SceneItemStore;
     private List<SceneItem>? SceneItemStore;
-    private string SceneItemSelectedId;
+    private string SceneItemSelectedId = string.Empty;
 
 
     [Inject] IContentAccess? ContentAccess { get; set; }
@@ -80,10 +81,12 @@
     {
         try
         {
-            SceneGraph = JsonConvert.DeserializeObject<SceneGraphPlus>(
+            SceneGraph = JsonConvert.DeserializeObject<SceneGraph>(
                 await ContentAccess!.ReadJson("_content/BlazorApp/data/SceneGraph.json")
             );
-            
+
+            Dictionary<string, IImageAnnotationData> testdict = SceneGraph.SceneItems;
+
             SceneItemStore = JsonConvert.DeserializeObject<List<SceneItem>>(
                 await ContentAccess!.ReadJson("_content/BlazorApp/data/SceneItems.json")
             );
@@ -106,11 +109,11 @@
             var id = Guid.NewGuid().ToString();
             SceneItemSelectedId = id;
 
-            var sceneItem = new SceneItemPlus()
+            var sceneItem = new SceneItem()
                 {
                     Id = id,
                     Name = item.Name,
-                    Source = item.ImageURL,
+                    Source = item.Source,
                     X = imageWidth / 2,
                     Y = imageHeight / 2,
                     Order = 0,
@@ -133,7 +136,7 @@
         if (annotatedImage is null)
             return Task.CompletedTask;
 
-        if (!SceneGraph.SceneItems.TryGetValue(id, out SceneItemPlus? fruitItem))
+        if (!SceneGraph.SceneItems.TryGetValue(id, out ISceneItem? fruitItem))
             return Task.CompletedTask;
 
         // Console.WriteLine($"Selected:{id}");
@@ -145,7 +148,7 @@
         if (annotatedImage is null)
             return Task.CompletedTask;
 
-        if (!SceneGraph.SceneItems.TryGetValue(id, out SceneItemPlus? fruitItem))
+        if (!SceneGraph.SceneItems.TryGetValue(id, out ISceneItem? fruitItem))
             return Task.CompletedTask;
         //Console.WriteLine($"StartMove:{id}");
         return Task.CompletedTask;
@@ -156,7 +159,7 @@
         if (annotatedImage is null)
             return;
 
-        if (!SceneGraph.SceneItems.TryGetValue(id, out SceneItemPlus? fruitItem))
+        if (!SceneGraph.SceneItems.TryGetValue(id, out ISceneItem? fruitItem))
             return;
         //Console.WriteLine($"Moved:{id}");
 
@@ -171,7 +174,7 @@
         if (annotatedImage is null)
             return;
 
-        if (!SceneGraph.SceneItems.TryGetValue(id, out SceneItemPlus? fruitItem))
+        if (!SceneGraph.SceneItems.TryGetValue(id, out ISceneItem? fruitItem))
             return;
 
         //Console.WriteLine($"EndMove:{id}");
@@ -185,7 +188,7 @@
         if (annotatedImage is null)
             return;
 
-        if (!SceneGraph.SceneItems.TryGetValue(id, out SceneItemPlus? fruitItem))
+        if (!SceneGraph.SceneItems.TryGetValue(id, out ISceneItem? fruitItem))
             return;
 
         //Console.WriteLine($"Unselected:{id}");
