@@ -1,6 +1,6 @@
 ﻿namespace BlazorApp
 {
-    public interface ISceneGraph //: ISceneGraph
+    public interface ISceneGraph 
     {
         double CameraHeight { get; set; }
         double Depth { get; set; }
