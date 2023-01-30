@@ -35,10 +35,11 @@
             Source="_content/BlazorApp/img/EmptyWeddingHall.png"
         />
     </Div>
-    @foreach(var item in AnnotatedImageData) @*render SceneItems*@
+    @foreach(var item in AnnotatedImageData)
     {
-        <p>@item.Value.Name @GetScenePOSX(item.Key)</p>
+    <p>@item.Value.Name @GetScenePOSX(item.Value.Id)</p>
     }
+ 
     @*
     @foreach(var item in SceneItems.Values)
     {
@@ -62,7 +63,7 @@
     private ISceneGraph? SceneGraph;
     private List<SceneItem>? SceneItemStore;
     private string SceneItemSelectedId = string.Empty;
-
+    private int count = 0;
 
     [Inject] IContentAccess? ContentAccess { get; set; }
 
@@ -79,19 +80,25 @@
     //}
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        await ReadSample();
+        if(firstRender)
+            await ReadSample();
         await base.OnAfterRenderAsync(firstRender);
     }
 
     private double GetScenePOSX(string id) {
 
-        if (SceneGraph is null)
-            return 0; // todo - throw
-        if(SceneGraph!.SceneItems.TryGetValue(id, out ISceneItem? item))
-            return item!.ScenePos.X;
+        Console.WriteLine($"id={id}");
 
-        return 0; // todo - throw
-                  // eturn SceneGraph!.SceneItems[id]!.ScenePos!.X;
+        if (SceneGraph?.SceneItems?.TryGetValue(id, out ISceneItem? SceneItem) ?? false)
+        {
+            return SceneItem.ScenePos.X;
+        }
+        else
+        {
+            //throw new Exception($"Can't find key 'id' in SceneGraph.SceneItems, or SceneGraph was null");
+
+            return 99999999;
+        }
     }
 
     private async Task ReadSample()
@@ -138,7 +145,7 @@
             sceneItem.Scale = CalculateScale(sceneItem);
             sceneItem.ScenePos.X = 10.0;
             SceneGraph!.SceneItems.Add(sceneItem.Id, sceneItem); //warn - id by val if from local scope => breaks trygetval object string compare
-            AnnotatedImageData.Add(sceneItem.Id, sceneItem); //warn - id by val if from local scope => breaks trygetval object string compare
+            AnnotatedImageData.Add(sceneItem.Id, (IImageAnnotationData) sceneItem); //warn - id by val if from local scope => breaks trygetval object string compare
         }
         catch (Exception e)
         {
