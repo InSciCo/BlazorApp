@@ -35,10 +35,19 @@
             Source="_content/BlazorApp/img/EmptyWeddingHall.png"
         />
     </Div>
+    @if (SceneGraph?.SceneItems.Count() > 0)
+    {
+        @foreach(var item in SceneGraph.SceneItems.Values)
+        {
+            <p>@item.Name @item.ScenePos.X @item.ScenePos.Y @item.ScenePos.Z</p>
+        }
+    }
+    @*
     @foreach(var item in AnnotatedImageData)
     {
         <p>@item.Value.Name @GetScenePOSX(item.Value.Id)</p>
     }
+    *@
 
 </Div>
 
@@ -65,19 +74,19 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private double GetScenePOSX(string id) {
+    //private double GetScenePOSX(string id) {
 
-        Console.WriteLine($"id={id}");
+    //    Console.WriteLine($"id={id}");
 
-        if (SceneGraph?.SceneItems?.TryGetValue(id, out ISceneItem? SceneItem) ?? false)
-        {
-            return SceneItem.ScenePos.X;
-        }
-        else
-        {
-            throw new Exception($"Can't find key 'id' in SceneGraph.SceneItems, or SceneGraph was null");
-        }
-    }
+    //    if (SceneGraph?.SceneItems?.TryGetValue(id, out ISceneItem? SceneItem) ?? false)
+    //    {
+    //        return SceneItem.ScenePos.X;
+    //    }
+    //    else
+    //    {
+    //        throw new Exception($"Can't find key 'id' in SceneGraph.SceneItems, or SceneGraph was null");
+    //    }
+    //}
 
     private async Task ReadSample()
     {
@@ -162,7 +171,7 @@
 
         if (SceneGraph?.SceneItems?.TryGetValue(id, out ISceneItem sceneItem) ?? false)
         {
-            sceneItem.ScenePos.X = sceneItem.X;
+            SceneGraphExtensions.SceneToAnnotation(SceneGraph, id);
             sceneItem.Scale = CalculateScale(sceneItem);
             if (SetOrder())
                 await InvokeAsync(StateHasChanged);

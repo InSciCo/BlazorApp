@@ -9,14 +9,18 @@ namespace BlazorApp;
 
 public static class SceneGraphExtensions
 {
-    public static void SceneToAnnotation(this SceneGraph sceneGraph, string id, AnnotatedImage annotatedImage)
+    public static void SceneToAnnotation(this ISceneGraph sceneGraph, string id)
     {
-        if (!sceneGraph.SceneItems.TryGetValue(id, out ISceneItem? sceneItem)
-            || !annotatedImage.Annotations.TryGetValue(id, out IImageAnnotationData? annotationData))
+        if (sceneGraph?.SceneItems?.TryGetValue(id, out ISceneItem? sceneItem) ?? false)
+        {
+            sceneItem.ScenePos.X = sceneItem.X;
+            sceneItem.ScenePos.Y = sceneItem.Y;
             return;
-
-        annotationData.X = sceneItem.ScenePos.X; //scene item plus
-        annotationData.Y = sceneItem.ScenePos.Y;
+        }
+        else
+        {
+            throw new Exception($"Can't find key 'id' in SceneGraph.SceneItems, or SceneGraph was null");
+        }
     }
     public static void AnnotationToScene(this SceneGraph sceneGraph, string id, AnnotatedImage annotatedImage)
     {
