@@ -37,17 +37,8 @@
     </Div>
     @foreach(var item in AnnotatedImageData)
     {
-    <p>@item.Value.Name @GetScenePOSX(item.Value.Id)</p>
+        <p>@item.Value.Name @GetScenePOSX(item.Value.Id)</p>
     }
- 
-    @*
-    @foreach(var item in SceneItems.Values)
-    {
-    <p>@item.Name @item.Y @item.Order</p>
-    }
-    <img src="@imgdata" width="@imgwidth" height="@imgheight" />
-    <p> "Yada:" @yada</p>
-    *@
 
 </Div>
 
@@ -67,17 +58,6 @@
 
     [Inject] IContentAccess? ContentAccess { get; set; }
 
-    //public record SceenItemStore(string Name, string Image);
-    //private List<SceenItemStore> fruits = new()
-    //{
-    //    new("Apple", "_content/BlazorApp/img/apple.png"),
-    //    new("Bananas", "_content/BlazorApp/img/bananas.png")
-    //};
-    //protected override Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    base.OnAfterRenderAsync(firstRender);
-    //    return Task.CompletedTask;
-    //}
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         if(firstRender)
@@ -95,9 +75,7 @@
         }
         else
         {
-            //throw new Exception($"Can't find key 'id' in SceneGraph.SceneItems, or SceneGraph was null");
-
-            return 99999999;
+            throw new Exception($"Can't find key 'id' in SceneGraph.SceneItems, or SceneGraph was null");
         }
     }
 
@@ -163,7 +141,6 @@
         if (!AnnotatedImageData.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
             return Task.CompletedTask;
 
-        // Console.WriteLine($"Selected:{id}");
         return Task.CompletedTask;
     }
 
@@ -174,26 +151,26 @@
 
         if (!AnnotatedImageData.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
             return Task.CompletedTask;
-        //Console.WriteLine($"StartMove:{id}");
+
         return Task.CompletedTask;
     }
 
-    private async Task ImageAnnotationMoved(string id) //use this one
+    private async Task ImageAnnotationMoved(string id)
     {
         if (annotatedImage is null)
             return;
 
-        if (AnnotatedImageData.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+        if (SceneGraph?.SceneItems?.TryGetValue(id, out ISceneItem sceneItem) ?? false)
         {
-            imageAnnotation.Scale = CalculateScale(imageAnnotation);
+            sceneItem.ScenePos.X = sceneItem.X;
+            sceneItem.Scale = CalculateScale(sceneItem);
             if (SetOrder())
                 await InvokeAsync(StateHasChanged);
             return;
-
         }
         else
         {
-            throw new Exception($"Can't find key");
+            throw new Exception($"Can't find key 'id' in SceneGraph.SceneItems, or SceneGraph was null");
         }
     }
 
@@ -205,7 +182,6 @@
         if (!AnnotatedImageData.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
             return;
 
-        //Console.WriteLine($"EndMove:{id}");
         if (SetOrder())
             await InvokeAsync(StateHasChanged);
         return;
@@ -219,7 +195,6 @@
         if (!AnnotatedImageData.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
             return;
 
-        //Console.WriteLine($"Unselected:{id}");
         if (SetOrder())
             await InvokeAsync(StateHasChanged);
         return;
@@ -247,8 +222,7 @@
             }
             order++;
         }
-        //if (changed)
-        //    Console.WriteLine("OrderChanged");
+
         return changed;
     }
 
