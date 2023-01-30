@@ -26,7 +26,7 @@
         </Div>
         <AnnotatedImage
             @ref="@annotatedImage"
-            Annotations="@SceneItems"
+            Annotations="@AnnotatedImageData"
             OnImageAnnotationSelected="ImageAnnotationSelected"
             OnImageAnnotationStartMove="ImageAnnotationStartMove"
             OnImageAnnotationMoved="ImageAnnotationMoved"
@@ -35,21 +35,28 @@
             Source="_content/BlazorApp/img/EmptyWeddingHall.png"
         />
     </Div>
-    @*    @foreach(var item in SceneItems.Values) @*render SceneItems
+    @foreach(var item in AnnotatedImageData) @*render SceneItems*@
+    {
+        <p>@item.Value.Name @GetScenePOSX(item.Key)</p>
+    }
+    @*
+    @foreach(var item in SceneItems.Values)
     {
     <p>@item.Name @item.Y @item.Order</p>
-    }*@
+    }
     <img src="@imgdata" width="@imgwidth" height="@imgheight" />
     <p> "Yada:" @yada</p>
+    *@
+
 </Div>
 
 @code {
 
-    private AnnotatedImage? annotatedImage;
+    private AnnotatedImage? annotatedImage; //Blazor assigned
     private string imgdata = string.Empty;
     private double imgwidth;
     private double imgheight;
-    private Dictionary<string, IImageAnnotationData> SceneItems = new();
+    private Dictionary<string, IImageAnnotationData> AnnotatedImageData = new();
     private int order;
     private string yada = string.Empty;
     private ISceneGraph? SceneGraph;
@@ -74,6 +81,17 @@
     {
         await ReadSample();
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private double GetScenePOSX(string id) {
+
+        if (SceneGraph is null)
+            return 0; // todo - throw
+        if(SceneGraph!.SceneItems.TryGetValue(id, out ISceneItem? item))
+            return item!.ScenePos.X;
+
+        return 0; // todo - throw
+                  // eturn SceneGraph!.SceneItems[id]!.ScenePos!.X;
     }
 
     private async Task ReadSample()
@@ -118,7 +136,9 @@
                     Width = 48
                 };
             sceneItem.Scale = CalculateScale(sceneItem);
-            SceneItems.Add(id, sceneItem);
+            sceneItem.ScenePos.X = 10.0;
+            SceneGraph!.SceneItems.Add(sceneItem.Id, sceneItem); //warn - id by val if from local scope => breaks trygetval object string compare
+            AnnotatedImageData.Add(sceneItem.Id, sceneItem); //warn - id by val if from local scope => breaks trygetval object string compare
         }
         catch (Exception e)
         {
@@ -133,7 +153,7 @@
         if (annotatedImage is null)
             return Task.CompletedTask;
 
-        if (!SceneItems.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+        if (!AnnotatedImageData.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
             return Task.CompletedTask;
 
         // Console.WriteLine($"Selected:{id}");
@@ -145,7 +165,7 @@
         if (annotatedImage is null)
             return Task.CompletedTask;
 
-        if (!SceneItems.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+        if (!AnnotatedImageData.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
             return Task.CompletedTask;
         //Console.WriteLine($"StartMove:{id}");
         return Task.CompletedTask;
@@ -156,14 +176,18 @@
         if (annotatedImage is null)
             return;
 
-        if (!SceneItems.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+        if (AnnotatedImageData.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+        {
+            imageAnnotation.Scale = CalculateScale(imageAnnotation);
+            if (SetOrder())
+                await InvokeAsync(StateHasChanged);
             return;
-        //Console.WriteLine($"Moved:{id}");
 
-        imageAnnotation.Scale = CalculateScale(imageAnnotation);
-        if (SetOrder())
-            await InvokeAsync(StateHasChanged);
-        return;
+        }
+        else
+        {
+            throw new Exception($"Can't find key");
+        }
     }
 
     private async Task ImageAnnotationEndMove(string id)
@@ -171,7 +195,7 @@
         if (annotatedImage is null)
             return;
 
-        if (!SceneItems.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+        if (!AnnotatedImageData.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
             return;
 
         //Console.WriteLine($"EndMove:{id}");
@@ -185,7 +209,7 @@
         if (annotatedImage is null)
             return;
 
-        if (!SceneItems.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+        if (!AnnotatedImageData.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
             return;
 
         //Console.WriteLine($"Unselected:{id}");
@@ -203,7 +227,7 @@
     }
     private bool SetOrder()
     {
-        var items = SceneItems.Values.OrderBy(x => x.Y).ToList(); 
+        var items = AnnotatedImageData.Values.OrderBy(x => x.Y).ToList(); 
         int order = 0;
         var changed = false;
         foreach (var item in items)
@@ -223,7 +247,7 @@
 
     private async Task Clear()
     {
-        SceneItems.Clear();
+        AnnotatedImageData.Clear();
         await Task.CompletedTask;
     }
 
@@ -236,7 +260,7 @@
     {
         if (annotatedImage is null)
             return;
-        imgdata = await annotatedImage!.GetMergedEncodedImage();
+        imgdata = await annotatedImage!.GetMergedEncodedImage(); //how is this the only place its assigned if its populating the xy of the image annotation in real time??????
         imgwidth = annotatedImage.ImgElementWidth;
         imgheight = annotatedImage.ImgElementHeight;
         await InvokeAsync(StateHasChanged);

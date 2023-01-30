@@ -10,7 +10,7 @@ namespace BlazorApp;
 public class SceneItem : ISceneItem
 {
     // IImageAnnotationData properties
-    public string? Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Note { get; set; } = string.Empty ;
     public double Order { get; set; }

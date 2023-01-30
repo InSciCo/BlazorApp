@@ -11,7 +11,7 @@ namespace Blazorise.AnnotatedImage;
 
 public interface IImageAnnotationData
 {
-    string? Id { get; set; }
+    string Id { get; set; }
     string Name { get; set; }
     string Note { get; set; }
     double Order { get; set; }
@@ -26,7 +26,7 @@ public interface IImageAnnotationData
 
 public class ImageAnnotationData : IImageAnnotationData
 {
-    public string? Id { get; set; } = string.Empty;
+    public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Note { get; set; } = string.Empty;
     public double Order { get; set; }
