@@ -130,20 +130,20 @@ namespace Blazorise.AnnotatedImage
         [Inject] private IVersionProvider? VersionProvider { get; set; }
         public BoundingClientRect? CanvasRect { get; private set; }
 
-        private BoundingClientRect _canvasFloorRect = new();
-        public BoundingClientRect? CanvasFloorRect { get
-            {
-                if (CanvasRect == null)
-                    return _canvasFloorRect;
+        //private BoundingClientRect _canvasFloorRect = new();
+        //public BoundingClientRect? CanvasFloorRect { get
+        //    {
+        //        if (CanvasRect == null)
+        //            return _canvasFloorRect;
 
-                _canvasFloorRect.Left = CanvasRect.Left;
-                _canvasFloorRect.Right = CanvasRect.Right;
-                _canvasFloorRect.Bottom = CanvasRect.Bottom;
-                _canvasFloorRect.Top = CanvasRect.Y + CanvasRect.Height * BaseBoardRatio;
+        //        _canvasFloorRect.Left = CanvasRect.Left;
+        //        _canvasFloorRect.Right = CanvasRect.Right;
+        //        _canvasFloorRect.Bottom = CanvasRect.Bottom;
+        //        _canvasFloorRect.Top = CanvasRect.Y + CanvasRect.Height * BaseBoardRatio;
 
-                return _canvasFloorRect;
-            }
-            }
+        //        return _canvasFloorRect;
+        //    }
+        //    }
 
         [Parameter] public string Source { get; set; } = string.Empty;
         [Parameter] public bool MultiSelect { get; set; }
