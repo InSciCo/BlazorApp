@@ -171,7 +171,8 @@
 
         if (SceneGraph?.SceneItems?.TryGetValue(id, out ISceneItem sceneItem) ?? false)
         {
-            SceneGraphExtensions.SceneToAnnotation(SceneGraph, id);
+            //SceneGraphExtensions.SceneToAnnotation(SceneGraph, id, annotatedImage.ImgElementHeight, annotatedImage.ImgElementWidth);
+            SceneGraph.AnnotationToScene(id, annotatedImage);
             sceneItem.Scale = CalculateScale(sceneItem);
             if (SetOrder())
                 await InvokeAsync(StateHasChanged);
