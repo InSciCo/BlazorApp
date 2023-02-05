@@ -22,6 +22,7 @@ public interface IImageAnnotationData
     double X { get; set; }
     double Y { get; set; }
     bool Selected { get; set; }
+    BoundingClientRect CanvasFloorRect { get; set; }
 }
 
 public class ImageAnnotationData : IImageAnnotationData
@@ -36,7 +37,8 @@ public class ImageAnnotationData : IImageAnnotationData
     public double Height { get; set; }
     public double X { get; set; }
     public double Y { get; set; }
-    public bool Selected { get; set; }  
+    public bool Selected { get; set; }
+    public BoundingClientRect CanvasFloorRect { get; set; } 
 }
 
 public enum PointerState { None, Single, Double }

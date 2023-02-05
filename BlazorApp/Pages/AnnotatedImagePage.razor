@@ -128,6 +128,7 @@
                     Order = 0,
                     Height = 48,
                     Width = 48
+                    CanvasFloorRect annotatedImage
                 };
             sceneItem.Scale = CalculateScale(sceneItem);
             sceneItem.ScenePos.X = 10.0;
@@ -162,6 +163,20 @@
             return Task.CompletedTask;
 
         return Task.CompletedTask;
+    }
+
+    private Task SetCanvasFloorRect(string id)
+    {
+        if (annotatedImage is null)
+            return Task.CompletedTask;
+
+        if (!AnnotatedImageData.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+            throw new Exception();
+        else
+        {
+            AnnotatedImageData[id].CanvasFloorRect.X = 0.0;
+            return Task.CompletedTask;
+        }
     }
 
     private async Task ImageAnnotationMoved(string id)

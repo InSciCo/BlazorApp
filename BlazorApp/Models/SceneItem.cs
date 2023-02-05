@@ -31,5 +31,6 @@ public class SceneItem : ISceneItem
     /// Position of center of object in Scene
     /// </summary>
     public ScenePos ScenePos { get; set; } = new();
+    public BoundingClientRect CanvasFloorRect { get; set; }
 
 }

@@ -130,6 +130,21 @@ namespace Blazorise.AnnotatedImage
         [Inject] private IVersionProvider? VersionProvider { get; set; }
         public BoundingClientRect? CanvasRect { get; private set; }
 
+        private BoundingClientRect _canvasFloorRect = new();
+        public BoundingClientRect? CanvasFloorRect { get
+            {
+                if (CanvasRect == null)
+                    return _canvasFloorRect;
+
+                _canvasFloorRect.Left = CanvasRect.Left;
+                _canvasFloorRect.Right = CanvasRect.Right;
+                _canvasFloorRect.Bottom = CanvasRect.Bottom;
+                _canvasFloorRect.Top = CanvasRect.Y + CanvasRect.Height * BaseBoardRatio;
+
+                return _canvasFloorRect;
+            }
+            }
+
         [Parameter] public string Source { get; set; } = string.Empty;
         [Parameter] public bool MultiSelect { get; set; }
         [Parameter] public Dictionary<string,IImageAnnotationData> Annotations { get; set; } = new();
@@ -138,6 +153,7 @@ namespace Blazorise.AnnotatedImage
         [Parameter] public EventCallback<string> OnImageAnnotationMoved { get; set; }
         [Parameter] public EventCallback<string> OnImageAnnotationEndMove { get; set; }
         [Parameter] public EventCallback<string> OnImageAnnotationUnselected { get; set; }
+        [Parameter] public double BaseBoardRatio { get; set; } = 0.5;
 
         /// <summary>
         /// Width of original image
