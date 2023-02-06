@@ -130,12 +130,12 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
         if (!pointerDown || ImageAnnotationData is null)
             return;
 
-        if(CanvasRect != null)
+        if(ImageAnnotationData.CanvasFloorRect != null)
         {
-            if(x + xCenterOffset < CanvasRect.Left) x= CanvasRect.Left + xCenterOffset;
-            if(x + xCenterOffset > CanvasRect.Right) x= CanvasRect.Right + xCenterOffset;     
-            if(y + yCenterOffset < CanvasRect.Top) y= CanvasRect.Top + yCenterOffset;
-            if(y + yCenterOffset > CanvasRect.Bottom) y= CanvasRect.Bottom + yCenterOffset; 
+            if(x + xCenterOffset < ImageAnnotationData.CanvasFloorRect.Left) x= ImageAnnotationData.CanvasFloorRect.Left + xCenterOffset;
+            if(x + xCenterOffset > ImageAnnotationData.CanvasFloorRect.Right) x= ImageAnnotationData.CanvasFloorRect.Right + xCenterOffset;     
+            if(y + yCenterOffset < ImageAnnotationData.CanvasFloorRect.Top) y= ImageAnnotationData.CanvasFloorRect.Top + yCenterOffset;
+            if(y + yCenterOffset > ImageAnnotationData.CanvasFloorRect.Bottom) y= ImageAnnotationData.CanvasFloorRect.Bottom + yCenterOffset; 
         }
 
         ImageAnnotationData.X += x - pageX;
@@ -198,7 +198,6 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     [Parameter] public bool Fluid { get; set; }
 
     [Parameter] public IImageAnnotationData? ImageAnnotationData { get; set; } 
-    [Parameter] public BoundingClientRect? CanvasRect { get; set; }
     [Parameter] public EventCallback<string> OnImageAnnotationSelected { get; set; }
     [Parameter] public EventCallback<string> OnImageAnnotationStartMove { get; set; }
     [Parameter] public EventCallback<string> OnImageAnnotationMoved { get; set; }
