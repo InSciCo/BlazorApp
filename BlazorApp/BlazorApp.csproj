@@ -33,6 +33,7 @@
 		<PackageReference Include="Blazorise.RichTextEdit" Version="1.1.4.1" />
 		<PackageReference Include="Blazorise.TreeView" Version="1.1.4.1" />
 		<PackageReference Include="BlazorPro.BlazorSize" Version="6.1.2" />
+		<PackageReference Include="DeepCloner" Version="0.10.4" />
 		<PackageReference Include="KristofferStrube.Blazor.FileSystemAccess" Version="2.1.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />

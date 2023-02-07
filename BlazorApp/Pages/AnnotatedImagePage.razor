@@ -2,97 +2,143 @@
 @page "/annotatedimage"
 @inject IJSRuntime JSRuntime 
 
-<h3>AnnotatedImagePage</h3>
 
+<h3>AnnotatedImagePage</h3>
 <Div Flex="Flex.Column">
     <Div Flex="Flex.Row">
         @* Available Items *@
         <Div Flex="Flex.Column" style="max-width:6rem;">
-            @foreach (var item in fruits)
+            @if (SceneItemStore != null)
             {
-                <Button Clicked="@((args) => ItemSelected(args,@item))" draggable="false">
-                    <Figure draggable="false">
-                        <FigureImage Source="@item.Image" draggable="false" />
-                        <FigureCaption>@item.Name</FigureCaption>
-                    </Figure>
-                </Button> 
+                @foreach (var item in SceneItemStore) @*scene item buttons*@
+                {
+                    <Button Clicked="@((args) => ItemSelected(args,@item))" draggable="false">
+                        <Figure draggable="false">
+                            <FigureImage Source="@item.Source" draggable="false" />
+                            <FigureCaption>@item.Name</FigureCaption>
+                        </Figure>
+                    </Button> 
+                }
             }
             <Button Border="Border.Is2" Color="Color.Primary" Clicked="Merge">Merge</Button>
             <Button Border="Border.Is2" Color="Color.Primary" Clicked="Clear">Clear</Button>
             <Button Border="Border.Is2" Color="Color.Primary" Clicked="ReadSample">Read</Button>
         </Div>
-
-        @* Annotated Image *@
         <AnnotatedImage
             @ref="@annotatedImage"
-            Annotations="@fruitItems"
+            Annotations="@Annotations"
             OnImageAnnotationSelected="ImageAnnotationSelected"
             OnImageAnnotationStartMove="ImageAnnotationStartMove"
             OnImageAnnotationMoved="ImageAnnotationMoved"
             OnImageAnnotationEndMove="ImageAnnotationEndMove"
             OnImageAnnotationUnselected="ImageAnnotationUnSelected"
-            Source="_content/BlazorApp/img/EmptyWeddingHall.png" />
+            Source="_content/BlazorApp/img/EmptyWeddingHall.png"
+        />
     </Div>
-    @foreach(var item in fruitItems.Values)
+    @if (SceneGraph?.SceneItems.Count() > 0)
     {
-        <p>@item.Name @item.Y @item.Order</p>
+        @foreach(var item in SceneGraph.SceneItems.Values)
+        {
+            <p>@item.Name @item.ScenePos.X @item.ScenePos.Y @item.ScenePos.Z</p>
+        }
     }
-    <img src="@imgdata" width="@imgwidth" height="@imgheight" />
-    <p> "Yada:" @yada</p>
+    @*
+    @foreach(var item in AnnotatedImageData)
+    {
+        <p>@item.Value.Name @GetScenePOSX(item.Value.Id)</p>
+    }
+    *@
+
 </Div>
 
 @code {
 
-    private AnnotatedImage? annotatedImage;
+    private AnnotatedImage? annotatedImage; //Blazor assigned
     private string imgdata = string.Empty;
     private double imgwidth;
     private double imgheight;
-    private Dictionary<string, IImageAnnotationData> fruitItems = new();
+    private Dictionary<string, IImageAnnotationData> Annotations = new();
     private int order;
     private string yada = string.Empty;
+    private ISceneGraph? SceneGraph;
+    private List<SceneItem>? SceneItemStore;
+    private string SceneItemSelectedId = string.Empty;
+    private int count = 0;
 
     [Inject] IContentAccess? ContentAccess { get; set; }
 
-    public record SceenItemStore(string Name, string Image);
-    private List<SceenItemStore> fruits = new()
+    protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        new("Apple", "_content/BlazorApp/img/apple.png"),
-        new("Bananas", "_content/BlazorApp/img/bananas.png")
-    };
-    protected override Task OnAfterRenderAsync(bool firstRender)
-    {
-        base.OnAfterRenderAsync(firstRender);
-        return Task.CompletedTask;
+        if(firstRender)
+            await ReadSample();
+        await base.OnAfterRenderAsync(firstRender);
     }
+
+    //private double GetScenePOSX(string id) {
+
+    //    Console.WriteLine($"id={id}");
+
+    //    if (SceneGraph?.SceneItems?.TryGetValue(id, out ISceneItem? SceneItem) ?? false)
+    //    {
+    //        return SceneItem.ScenePos.X;
+    //    }
+    //    else
+    //    {
+    //        throw new Exception($"Can't find key 'id' in SceneGraph.SceneItems, or SceneGraph was null");
+    //    }
+    //}
 
     private async Task ReadSample()
     {
-        yada = await ContentAccess!.ReadJson("_content/BlazorApp/data/SceneItems.json");
-        var sceneItems = JsonConvert.DeserializeObject<List<SceneItem>>(yada);
+        try
+        {
+            SceneGraph = JsonConvert.DeserializeObject<SceneGraph>(
+                await ContentAccess!.ReadJson("_content/BlazorApp/data/SceneGraph.json")
+            );
+
+            SceneItemStore = JsonConvert.DeserializeObject<List<SceneItem>>(
+                await ContentAccess!.ReadJson("_content/BlazorApp/data/SceneItems.json")
+            );
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        await InvokeAsync(StateHasChanged);
     }
-     
-    private async Task ItemSelected(MouseEventArgs args, SceenItemStore item)
+
+    private async Task ItemSelected(MouseEventArgs args, SceneItem item)
     {
-        if (annotatedImage is null)
-            return;
-        var imageWidth = annotatedImage.ImgElementWidth;
-        var imageHeight = annotatedImage.ImgElementHeight;
-        var id = Guid.NewGuid().ToString();
+        try
+        {
+            if (annotatedImage is null)
+                return;
+            var imageWidth = annotatedImage.ImgElementWidth;
+            var imageHeight = annotatedImage.ImgElementHeight;
+            var id = Guid.NewGuid().ToString();
+            SceneItemSelectedId = id;
 
-        var fruitItem = new ImageAnnotationData()
-            {
-                Id = id,
-                Name = item.Name,
-                Source = item.Image,
-                X = imageWidth / 2,
-                Y = imageHeight / 2,
-                Order = 0,
-                Height = 48,
-                Width = 48
-            };
-        fruitItem.Scale = CalculateScale(fruitItem);
-        fruitItems.Add(id, fruitItem);
-
+            var sceneItem = new SceneItem()
+                {
+                    Id = id,
+                    Name = item.Name,
+                    Source = item.Source,
+                    X = imageWidth / 2,
+                    Y = imageHeight / 2,
+                    Order = 0,
+                    Height = 48,
+                    Width = 48,
+                    CanvasFloorRect = annotatedImage.CanvasRect
+        };
+            sceneItem.Scale = CalculateScale(sceneItem);
+            sceneItem.ScenePos.X = 10.0;
+            SceneGraph!.SceneItems.Add(sceneItem.Id, sceneItem); //warn - id by val if from local scope => breaks trygetval object string compare
+            Annotations.Add(sceneItem.Id, (IImageAnnotationData) sceneItem); //warn - id by val if from local scope => breaks trygetval object string compare
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);    
+        }
         SetOrder();
         await Task.CompletedTask;
     }
@@ -102,10 +148,9 @@
         if (annotatedImage is null)
             return Task.CompletedTask;
 
-        if (!fruitItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
             return Task.CompletedTask;
 
-        // Console.WriteLine($"Selected:{id}");
         return Task.CompletedTask;
     }
 
@@ -114,10 +159,24 @@
         if (annotatedImage is null)
             return Task.CompletedTask;
 
-        if (!fruitItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
             return Task.CompletedTask;
-        //Console.WriteLine($"StartMove:{id}");
+
         return Task.CompletedTask;
+    }
+
+    private Task SetCanvasFloorRect(string id)
+    {
+        if (annotatedImage is null)
+            return Task.CompletedTask;
+
+        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+            throw new Exception();
+        else
+        {
+            Annotations[id].CanvasFloorRect.X = 0.0;
+            return Task.CompletedTask;
+        }
     }
 
     private async Task ImageAnnotationMoved(string id)
@@ -125,14 +184,19 @@
         if (annotatedImage is null)
             return;
 
-        if (!fruitItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+        if (SceneGraph?.SceneItems?.TryGetValue(id, out ISceneItem sceneItem) ?? false)
+        {
+            //SceneGraphExtensions.SceneToAnnotation(SceneGraph, id, annotatedImage.ImgElementHeight, annotatedImage.ImgElementWidth);
+            SceneGraph.AnnotationToScene(id, annotatedImage);
+            sceneItem.Scale = CalculateScale(sceneItem);
+            if (SetOrder())
+                await InvokeAsync(StateHasChanged);
             return;
-        //Console.WriteLine($"Moved:{id}");
-
-        fruitItem.Scale = CalculateScale(fruitItem);
-        if (SetOrder())
-            await InvokeAsync(StateHasChanged);
-        return;
+        }
+        else
+        {
+            throw new Exception($"Can't find key 'id' in SceneGraph.SceneItems, or SceneGraph was null");
+        }
     }
 
     private async Task ImageAnnotationEndMove(string id)
@@ -140,10 +204,9 @@
         if (annotatedImage is null)
             return;
 
-        if (!fruitItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
             return;
 
-        //Console.WriteLine($"EndMove:{id}");
         if (SetOrder())
             await InvokeAsync(StateHasChanged);
         return;
@@ -154,10 +217,9 @@
         if (annotatedImage is null)
             return;
 
-        if (!fruitItems.TryGetValue(id, out IImageAnnotationData? fruitItem))
+        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
             return;
 
-        //Console.WriteLine($"Unselected:{id}");
         if (SetOrder())
             await InvokeAsync(StateHasChanged);
         return;
@@ -172,7 +234,7 @@
     }
     private bool SetOrder()
     {
-        var items = fruitItems.Values.OrderBy(x => x.Y).ToList(); 
+        var items = Annotations.Values.OrderBy(x => x.Y).ToList(); 
         int order = 0;
         var changed = false;
         foreach (var item in items)
@@ -185,22 +247,26 @@
             }
             order++;
         }
-        //if (changed)
-        //    Console.WriteLine("OrderChanged");
+
         return changed;
     }
 
     private async Task Clear()
     {
-        fruitItems.Clear();
+        Annotations.Clear();
         await Task.CompletedTask;
+    }
+
+    private SceneItem Clone(SceneItem sceneItem)
+    {
+        return sceneItem.DeepClone();
     }
 
     public async Task Merge()
     {
         if (annotatedImage is null)
             return;
-        imgdata = await annotatedImage!.GetMergedEncodedImage();
+        imgdata = await annotatedImage!.GetMergedEncodedImage(); //how is this the only place its assigned if its populating the xy of the image annotation in real time??????
         imgwidth = annotatedImage.ImgElementWidth;
         imgheight = annotatedImage.ImgElementHeight;
         await InvokeAsync(StateHasChanged);

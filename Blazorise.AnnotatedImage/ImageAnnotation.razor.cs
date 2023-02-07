@@ -11,7 +11,6 @@ namespace Blazorise.AnnotatedImage;
 
 public interface IImageAnnotationData
 {
-    double Height { get; set; }
     string Id { get; set; }
     string Name { get; set; }
     string Note { get; set; }
@@ -19,24 +18,27 @@ public interface IImageAnnotationData
     double Scale { get; set; }
     string Source { get; set; }
     double Width { get; set; }
+    double Height { get; set; }
     double X { get; set; }
     double Y { get; set; }
     bool Selected { get; set; }
+    BoundingClientRect CanvasFloorRect { get; set; }
 }
 
 public class ImageAnnotationData : IImageAnnotationData
 {
     public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Note { get; set; } = string.Empty;
     public double Order { get; set; }
-    public double X { get; set; }
-    public double Y { get; set; }
+    public double Scale { get; set; }
     public string Source { get; set; } = string.Empty;
     public double Width { get; set; }
     public double Height { get; set; }
-    public double Scale { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Note { get; set; } = string.Empty;
-    public bool Selected { get; set; }  
+    public double X { get; set; }
+    public double Y { get; set; }
+    public bool Selected { get; set; }
+    public BoundingClientRect CanvasFloorRect { get; set; } 
 }
 
 public enum PointerState { None, Single, Double }
@@ -128,12 +130,12 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
         if (!pointerDown || ImageAnnotationData is null)
             return;
 
-        if(CanvasRect != null)
+        if(ImageAnnotationData.CanvasFloorRect != null)
         {
-            if(x + xCenterOffset < CanvasRect.Left) x= CanvasRect.Left + xCenterOffset;
-            if(x + xCenterOffset > CanvasRect.Right) x= CanvasRect.Right + xCenterOffset;     
-            if(y + yCenterOffset < CanvasRect.Top) y= CanvasRect.Top + yCenterOffset;
-            if(y + yCenterOffset > CanvasRect.Bottom) y= CanvasRect.Bottom + yCenterOffset; 
+            if(x + xCenterOffset < ImageAnnotationData.CanvasFloorRect.Left) x= ImageAnnotationData.CanvasFloorRect.Left + xCenterOffset;
+            if(x + xCenterOffset > ImageAnnotationData.CanvasFloorRect.Right) x= ImageAnnotationData.CanvasFloorRect.Right + xCenterOffset;     
+            if(y + yCenterOffset < ImageAnnotationData.CanvasFloorRect.Top) y= ImageAnnotationData.CanvasFloorRect.Top + yCenterOffset;
+            if(y + yCenterOffset > ImageAnnotationData.CanvasFloorRect.Bottom) y= ImageAnnotationData.CanvasFloorRect.Bottom + yCenterOffset; 
         }
 
         ImageAnnotationData.X += x - pageX;
@@ -196,7 +198,6 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     [Parameter] public bool Fluid { get; set; }
 
     [Parameter] public IImageAnnotationData? ImageAnnotationData { get; set; } 
-    [Parameter] public BoundingClientRect? CanvasRect { get; set; }
     [Parameter] public EventCallback<string> OnImageAnnotationSelected { get; set; }
     [Parameter] public EventCallback<string> OnImageAnnotationStartMove { get; set; }
     [Parameter] public EventCallback<string> OnImageAnnotationMoved { get; set; }
