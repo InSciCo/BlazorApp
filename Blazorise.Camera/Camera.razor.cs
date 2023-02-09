@@ -1,9 +1,5 @@
 ﻿
 #region Using directives
-using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using Blazorise.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -18,47 +14,26 @@ public partial class Camera : BaseComponent, IAsyncDisposable
 
 	#region Methods
 
-	/// <inheritdoc />
-	public override async Task SetParametersAsync(ParameterView parameters)
-	{
-		if(Rendered)
-		{
-
-		}
-
-		await base.SetParametersAsync(parameters);	
-	}
-
 	/// <inheritdoc/>
 	protected override Task OnInitializedAsync()
 	{
 		if (JSModule == null)
-		{
 			JSModule = new JSCameraModule(JSRuntime, VersionProvider);
-		}
-
 		return base.OnInitializedAsync();
 	}
-
-
 	/// <inheritdoc />
 	protected override async Task OnFirstAfterRenderAsync()
 	{
-		await JSModule.Initialize(ElementRef, _canvasRef, MirrorImage);
+		await JSModule.Initialize(ElementRef, _canvasRef, MirrorImage, "environment");
 	}
 
 	/// <inheritdoc/>
 	protected override async ValueTask DisposeAsync(bool disposing)
 	{
 		if (disposing && Rendered)
-		{
 			await JSModule.SafeDisposeAsync();
-		}
-
 		await base.DisposeAsync(disposing);
 	}
-
-
 	public async ValueTask<string> TakePicture()
 	{
 		return await JSModule.TakePicture();

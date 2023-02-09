@@ -13,7 +13,6 @@ namespace Blazorise.Camera;
 public class JSCameraModule : BaseJSModule
 {
 	#region Constructors
-
 	/// <summary>
 	/// Default module constructor.
 	/// </summary>
@@ -22,20 +21,20 @@ public class JSCameraModule : BaseJSModule
 	public JSCameraModule(IJSRuntime jsRuntime, IVersionProvider versionProvider) : base(jsRuntime, versionProvider)
 	{
 	}
-
 	#endregion
 
 	#region Methods
 
 	/// <summary>
-	/// Initializes the new Camera within the JS module.
+	/// Initialize Camera with specified options
 	/// </summary>
-	/// <param name="elementRef">Reference to the rendered element.</param>
-	/// <param name="elementId">ID of the rendered element.</param>
-	/// <param name="options">Additional options for the tooltip initialization.</param>
-	/// <returns>A task that represents the asynchronous operation.</returns>
-	public virtual ValueTask Initialize(ElementReference elementRef, ElementReference canvasRef, bool mirrorImage)
-		=> InvokeSafeVoidAsync("initialize", elementRef, canvasRef, mirrorImage);
+	/// <param name="videoRef">video element reference</param>
+	/// <param name="canvasRef">canvas element reference</param>
+	/// <param name="mirrorImage"></param>
+	/// <param name="facingMode">Must be one of: "user" | "environment"</param>
+	/// <returns></returns>
+	public virtual ValueTask Initialize(ElementReference videoRef, ElementReference canvasRef, bool mirrorImage, string facingMode)
+		=> InvokeSafeVoidAsync("initialize", videoRef, canvasRef, mirrorImage, facingMode);
 
 	/// <summary>
 	/// Take picture and return base64 encoded string.

@@ -1,0 +1,26 @@
+[
+  {
+    "Name": "Apple",
+    "Source": "_content/BlazorApp/img/apple.png",
+    "Width": 48,
+    "Height": 48,
+    "HeightOffFloor": 0,
+    "ScenePos": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    }
+  },
+  {
+    "Name": "Bananas",
+    "Source": "_content/BlazorApp/img/bananas.png",
+    "Width": 48,
+    "Height": 48,
+    "HeightOffFloor": 0,
+    "ScenePos": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    }
+  }
+]

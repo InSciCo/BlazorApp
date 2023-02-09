@@ -10,7 +10,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="ReactiveUI" Version="18.4.1" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.1" />
-    <PackageReference Include="SkiaSharp.Views.Blazor" Version="2.88.3" />
   </ItemGroup>
 
 </Project>

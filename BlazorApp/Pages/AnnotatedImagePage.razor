@@ -1,0 +1,276 @@
+﻿@namespace BlazorApp 
+@page "/annotatedimage"
+@inject IJSRuntime JSRuntime 
+
+
+<h3>AnnotatedImagePage</h3>
+<Div Flex="Flex.Column">
+    <Div Flex="Flex.Row">
+        @* Available Items *@
+        <Div Flex="Flex.Column" style="max-width:6rem;">
+            @if (SceneItemStore != null)
+            {
+                @foreach (var item in SceneItemStore) @*scene item buttons*@
+                {
+                    <Button Clicked="@((args) => ItemSelected(args,@item))" draggable="false">
+                        <Figure draggable="false">
+                            <FigureImage Source="@item.Source" draggable="false" />
+                            <FigureCaption>@item.Name</FigureCaption>
+                        </Figure>
+                    </Button> 
+                }
+            }
+            <Button Border="Border.Is2" Color="Color.Primary" Clicked="Merge">Merge</Button>
+            <Button Border="Border.Is2" Color="Color.Primary" Clicked="Clear">Clear</Button>
+            <Button Border="Border.Is2" Color="Color.Primary" Clicked="ReadSample">Read</Button>
+        </Div>
+        <AnnotatedImage
+            @ref="@annotatedImage"
+            Annotations="@Annotations"
+            OnImageAnnotationSelected="ImageAnnotationSelected"
+            OnImageAnnotationStartMove="ImageAnnotationStartMove"
+            OnImageAnnotationMoved="ImageAnnotationMoved"
+            OnImageAnnotationEndMove="ImageAnnotationEndMove"
+            OnImageAnnotationUnselected="ImageAnnotationUnSelected"
+            Source="_content/BlazorApp/img/EmptyWeddingHall.png"
+        />
+    </Div>
+    @if (SceneGraph?.SceneItems.Count() > 0)
+    {
+        @foreach(var item in SceneGraph.SceneItems.Values)
+        {
+            <p>@item.Name @item.ScenePos.X @item.ScenePos.Y @item.ScenePos.Z</p>
+        }
+    }
+    @*
+    @foreach(var item in AnnotatedImageData)
+    {
+        <p>@item.Value.Name @GetScenePOSX(item.Value.Id)</p>
+    }
+    *@
+    <img src="@imgdata" />
+
+</Div>
+
+@code {
+
+    private AnnotatedImage? annotatedImage; //Blazor assigned
+    private string imgdata = string.Empty;
+    private double imgwidth;
+    private double imgheight;
+    private Dictionary<string, IImageAnnotationData> Annotations = new();
+    private int order;
+    private string yada = string.Empty;
+    private ISceneGraph? SceneGraph;
+    private List<SceneItem>? SceneItemStore;
+    private string SceneItemSelectedId = string.Empty;
+    private int count = 0;
+
+    [Inject] IContentAccess? ContentAccess { get; set; }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+            await ReadSample();
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    //private double GetScenePOSX(string id) {
+
+    //    Console.WriteLine($"id={id}");
+
+    //    if (SceneGraph?.SceneItems?.TryGetValue(id, out ISceneItem? SceneItem) ?? false)
+    //    {
+    //        return SceneItem.ScenePos.X;
+    //    }
+    //    else
+    //    {
+    //        throw new Exception($"Can't find key 'id' in SceneGraph.SceneItems, or SceneGraph was null");
+    //    }
+    //}
+
+    private async Task ReadSample()
+    {
+        try
+        {
+            SceneGraph = JsonConvert.DeserializeObject<SceneGraph>(
+                await ContentAccess!.ReadJson("_content/BlazorApp/data/SceneGraph.json")
+            );
+
+            SceneItemStore = JsonConvert.DeserializeObject<List<SceneItem>>(
+                await ContentAccess!.ReadJson("_content/BlazorApp/data/SceneItems.json")
+            );
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ItemSelected(MouseEventArgs args, SceneItem item)
+    {
+        try
+        {
+            if (annotatedImage is null)
+                return;
+            var imageWidth = annotatedImage.ImgElementWidth;
+            var imageHeight = annotatedImage.ImgElementHeight;
+            var id = Guid.NewGuid().ToString();
+            SceneItemSelectedId = id;
+
+            var sceneItem = new SceneItem()
+                {
+                    Id = id,
+                    Name = item.Name,
+                    Source = item.Source,
+                    X = imageWidth / 2,
+                    Y = imageHeight / 2,
+                    Order = 0,
+                    Height = 48,
+                    Width = 48,
+                    CanvasFloorRect = annotatedImage.CanvasRect
+        };
+            sceneItem.Scale = CalculateScale(sceneItem);
+            sceneItem.ScenePos.X = 10.0;
+            SceneGraph!.SceneItems.Add(sceneItem.Id, sceneItem); //warn - id by val if from local scope => breaks trygetval object string compare
+            Annotations.Add(sceneItem.Id, (IImageAnnotationData) sceneItem); //warn - id by val if from local scope => breaks trygetval object string compare
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);    
+        }
+        SetOrder();
+        await Task.CompletedTask;
+    }
+
+    private Task ImageAnnotationSelected(string id)
+    {
+        if (annotatedImage is null)
+            return Task.CompletedTask;
+
+        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+            return Task.CompletedTask;
+
+        return Task.CompletedTask;
+    }
+
+    private Task ImageAnnotationStartMove(string id)
+    {
+        if (annotatedImage is null)
+            return Task.CompletedTask;
+
+        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+            return Task.CompletedTask;
+
+        return Task.CompletedTask;
+    }
+
+    private Task SetCanvasFloorRect(string id)
+    {
+        if (annotatedImage is null)
+            return Task.CompletedTask;
+
+        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+            throw new Exception();
+        else
+        {
+            Annotations[id].CanvasFloorRect.X = 0.0;
+            return Task.CompletedTask;
+        }
+    }
+
+    private async Task ImageAnnotationMoved(string id)
+    {
+        if (annotatedImage is null)
+            return;
+
+        if (SceneGraph?.SceneItems?.TryGetValue(id, out ISceneItem sceneItem) ?? false)
+        {
+            //SceneGraphExtensions.SceneToAnnotation(SceneGraph, id, annotatedImage.ImgElementHeight, annotatedImage.ImgElementWidth);
+            SceneGraph.AnnotationToScene(id, annotatedImage);
+            sceneItem.Scale = CalculateScale(sceneItem);
+            if (SetOrder())
+                await InvokeAsync(StateHasChanged);
+            return;
+        }
+        else
+        {
+            throw new Exception($"Can't find key 'id' in SceneGraph.SceneItems, or SceneGraph was null");
+        }
+    }
+
+    private async Task ImageAnnotationEndMove(string id)
+    {
+        if (annotatedImage is null)
+            return;
+
+        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+            return;
+
+        if (SetOrder())
+            await InvokeAsync(StateHasChanged);
+        return;
+    }
+
+    private async Task ImageAnnotationUnSelected(string id)
+    {
+        if (annotatedImage is null)
+            return;
+
+        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+            return;
+
+        if (SetOrder())
+            await InvokeAsync(StateHasChanged);
+        return;
+    }
+
+    private double CalculateScale(IImageAnnotationData annotation)
+    {
+        if (annotatedImage is null)
+            return 0.5;
+
+        return 0.25 + (0.75 * annotation.Y / (annotatedImage.CanvasRect!.Bottom - annotatedImage.CanvasRect!.Top));
+    }
+    private bool SetOrder()
+    {
+        var items = Annotations.Values.OrderBy(x => x.Y).ToList(); 
+        int order = 0;
+        var changed = false;
+        foreach (var item in items)
+        {
+            if(item.Order != order)
+            {
+                Console.WriteLine($"order:{item.Order} {order}");
+                item.Order = order;
+                changed = true;
+            }
+            order++;
+        }
+
+        return changed;
+    }
+
+    private async Task Clear()
+    {
+        Annotations.Clear();
+        await Task.CompletedTask;
+    }
+
+    private SceneItem Clone(SceneItem sceneItem)
+    {
+        return sceneItem.DeepClone();
+    }
+
+    public async Task Merge()
+    {
+        if (annotatedImage is null)
+            return;
+        imgdata = await annotatedImage!.GetMergedEncodedImage(); 
+        imgwidth = annotatedImage.ImgElementWidth;
+        imgheight = annotatedImage.ImgElementHeight;
+        await InvokeAsync(StateHasChanged);
+    }
+
+}

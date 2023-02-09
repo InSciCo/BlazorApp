@@ -1,11 +1,10 @@
 ﻿@namespace BlazorApp 
 @page "/camera"
 
-
 <Div Flex="Flex.Column" Margin="Margin.Is3">
     <h3>CameraPage</h3>
 
-    <Camera @ref="_camera" MirrorImage="true" />
+    <Camera @ref="_camera" MirrorImage="false" />
     <Button Clicked="TakePicture" Color="Color.Primary">Take Picture</Button>
     
     <Figure>

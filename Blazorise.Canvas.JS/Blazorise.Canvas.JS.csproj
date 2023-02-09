@@ -38,4 +38,5 @@
 	<Target Name="CopyDist" AfterTargets="RunWebpack" DependsOnTargets="RunWebpack">
 		<Copy SourceFiles="@(WebpackOutputs)" DestinationFolder="..\Blazorise.Canvas\wwwroot" SkipUnchangedFiles="true" />
 	</Target>
+	
 </Project>

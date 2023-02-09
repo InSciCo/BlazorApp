@@ -34,5 +34,9 @@
 	<string>This app requires access to your camera. Please grant access to your camera when requested.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app requires access to your microphone. Please grant access to your microphone when requested.</string>
+	<key>CFBundleDisplayName</key>
+	<string>BlazorApp.Maui</string>
+	<key>UIStatusBarHidden</key>
+	<true/>
 </dict>
 </plist>

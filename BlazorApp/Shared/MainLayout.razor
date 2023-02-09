@@ -1,29 +1,33 @@
 ﻿@namespace BlazorApp
 @inherits LayoutComponentBase
+<MediaQueryList>
+	<Layout>
+		<LayoutHeader Fixed="true" Style="z-index:3;" Background="Background.Primary">
+			<Bar Visible="false">
+				<BarToggler />
+				<BarBrand>
+					BlazorApp
+				</BarBrand>
+				<BarMenu Background="Background.Primary" Padding="Padding.Is2" >
+					<BarStart  >
+						<NavMenuItem Text="Home" Href="" />
+						<NavMenuItem Text="Location" Href="location" />
+						<NavMenuItem Text="Camera" Href="camera" />
+						<NavMenuItem Text="SelectImage" Href="selectimage" />
+						<NavMenuItem Text="ImageCapture" Href="imagecapture" />
+						<NavMenuItem Text="Graphics" Href="graphics" />
+						<NavMenuItem Text="DragDropZones" Href="dragdropzones" />
+						<NavMenuItem Text="AnnotatedImage" Href="annotatedimage" />
+					</BarStart>
+				</BarMenu>
+			</Bar>
+		</LayoutHeader>
 
-<Layout>
-	<LayoutHeader Fixed="true" Style="z-index:3;" Background="Background.Primary">
-		<Bar Visible="false">
-			<BarToggler />
-			<BarBrand>
-				BlazorApp
-			</BarBrand>
-			<BarMenu Background="Background.Primary" Padding="Padding.Is2" >
-				<BarStart  >
-					<NavMenuItem Text="Home" Href="" />
-					<NavMenuItem Text="Location" Href="location" />
-					<NavMenuItem Text="Camera" Href="camera" />
-					<NavMenuItem Text="Graphics" Href="graphics" />
-				</BarStart>
-			</BarMenu>
-		</Bar>
-	</LayoutHeader>
-
-	<LayoutContent>
-		@Body
-	</LayoutContent>
-</Layout>
-
+		<LayoutContent>
+			@Body
+		</LayoutContent>
+	</Layout>
+</MediaQueryList>
 @code {
 
 }
