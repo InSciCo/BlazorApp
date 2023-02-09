@@ -4,59 +4,27 @@ using Blazorise.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
-using System.Data.SqlTypes;
 #endregion
 
 namespace Blazorise.AnnotatedImage;
 
-public interface IImageAnnotationData
-{
-    string Id { get; set; }
-    string Name { get; set; }
-    string Note { get; set; }
-    double Order { get; set; }
-    double Scale { get; set; }
-    string Source { get; set; }
-    double Width { get; set; }
-    double Height { get; set; }
-    double X { get; set; }
-    double Y { get; set; }
-    bool Selected { get; set; }
-    BoundingClientRect CanvasFloorRect { get; set; }
-}
-
-public class ImageAnnotationData : IImageAnnotationData
-{
-    public string Id { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public string Note { get; set; } = string.Empty;
-    public double Order { get; set; }
-    public double Scale { get; set; }
-    public string Source { get; set; } = string.Empty;
-    public double Width { get; set; }
-    public double Height { get; set; }
-    public double X { get; set; }
-    public double Y { get; set; }
-    public bool Selected { get; set; }
-    public BoundingClientRect CanvasFloorRect { get; set; } 
-}
-
 public enum PointerState { None, Single, Double }
-public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
+public partial class ImageAnnotation<TItem> : BaseComponent, IAsyncDisposable
+    where TItem : IImageAnnotationData
 {
     #region Members
-    private string containerPos => $"top:{y}px; left:{x}px; width:{imageWidth}px; height:{imageHeight}px; {borderStyle} z-index:{ImageAnnotationData!.Order + 100}";
-    private string borderStyle => ImageAnnotationData!.Selected ? "border: solid; border-color: yellow;" : "" ;
+    private string containerPos => $"top:{y}px; left:{x}px; width:{imageWidth}px; height:{imageHeight}px; {borderStyle} z-index:{ImageAnnotationData!.CanvasInfo.Order + 100}";
+    private string borderStyle => ImageAnnotationData!.CanvasInfo!.Selected ? "border: solid; border-color: yellow;" : "" ;
     private double pageX;
     private double pageY;
     private bool pointerDown;
     private bool isMoved;
     private bool pendingUnselect;
 
-    private double imageHeight => ImageAnnotationData!.Scale * ImageAnnotationData.Height;
-    private double imageWidth => ImageAnnotationData!.Scale * ImageAnnotationData.Width;
-    private double x => ImageAnnotationData!.X - imageWidth / 2.0;
-    private double y => ImageAnnotationData!.Y - imageHeight / 2.0;
+    private double imageHeight => ImageAnnotationData!.CanvasInfo!.Scale * ImageAnnotationData.CanvasInfo.Height;
+    private double imageWidth => ImageAnnotationData!.CanvasInfo!.Scale * ImageAnnotationData.CanvasInfo.Width;
+    private double x => ImageAnnotationData!.CanvasInfo!.X - imageWidth / 2.0;
+    private double y => ImageAnnotationData!.CanvasInfo!.Y - imageHeight / 2.0;
     private double xCenterOffset;
     private double yCenterOffset;   
     #endregion
@@ -87,7 +55,7 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     }
     private async void PointerDown(PointerEventArgs args)
     {
-        if (pointerDown || ImageAnnotationData is null )
+        if (pointerDown || ImageAnnotationData?.CanvasInfo is null)
             return;
 
         await JSModule!.SetPointerCapture(ElementRef, args.PointerId);
@@ -96,8 +64,8 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
         CalculateCenterOffset(args.PageX, args.PageY);
         pointerDown = true;
         isMoved = false;
-        pendingUnselect = ImageAnnotationData.Selected;
-        ImageAnnotationData.Selected = true;
+        pendingUnselect = ImageAnnotationData.CanvasInfo.Selected;
+        ImageAnnotationData.CanvasInfo.Selected = true;
         await OnImageAnnotationSelected.InvokeAsync(ImageAnnotationData.Id);
     }
     private async Task PointerMove(PointerEventArgs args)
@@ -108,7 +76,7 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     }
     private async Task PointerUp(PointerEventArgs args)
     {
-        if (!pointerDown || ImageAnnotationData is null)
+        if (!pointerDown || ImageAnnotationData?.CanvasInfo is null)
             return;
 
         await CalculateMovement(args.PageX, args.PageY); 
@@ -118,7 +86,7 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
 
         if (!isMoved && pendingUnselect)
         {
-            ImageAnnotationData.Selected = false;
+            ImageAnnotationData.CanvasInfo.Selected = false;
             await OnImageAnnotationUnselected.InvokeAsync(ImageAnnotationData.Id);
         }
         pointerDown = false;
@@ -127,19 +95,19 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
 
     private async Task CalculateMovement(double x, double y)
     {
-        if (!pointerDown || ImageAnnotationData is null)
+        if (!pointerDown || ImageAnnotationData?.CanvasInfo is null)
             return;
 
-        if(ImageAnnotationData.CanvasFloorRect != null)
+        if(ImageAnnotationData.CanvasInfo.CanvasFloorRect != null)
         {
-            if(x + xCenterOffset < ImageAnnotationData.CanvasFloorRect.Left) x= ImageAnnotationData.CanvasFloorRect.Left + xCenterOffset;
-            if(x + xCenterOffset > ImageAnnotationData.CanvasFloorRect.Right) x= ImageAnnotationData.CanvasFloorRect.Right + xCenterOffset;     
-            if(y + yCenterOffset < ImageAnnotationData.CanvasFloorRect.Top) y= ImageAnnotationData.CanvasFloorRect.Top + yCenterOffset;
-            if(y + yCenterOffset > ImageAnnotationData.CanvasFloorRect.Bottom) y= ImageAnnotationData.CanvasFloorRect.Bottom + yCenterOffset; 
+            if(x + xCenterOffset < ImageAnnotationData.CanvasInfo.CanvasFloorRect.Left) x= ImageAnnotationData.CanvasInfo.CanvasFloorRect.Left + xCenterOffset;
+            if(x + xCenterOffset > ImageAnnotationData.CanvasInfo.CanvasFloorRect.Right) x= ImageAnnotationData.CanvasInfo.CanvasFloorRect.Right + xCenterOffset;     
+            if(y + yCenterOffset < ImageAnnotationData.CanvasInfo.CanvasFloorRect.Top) y= ImageAnnotationData.CanvasInfo.CanvasFloorRect.Top + yCenterOffset;
+            if(y + yCenterOffset > ImageAnnotationData.CanvasInfo.CanvasFloorRect.Bottom) y= ImageAnnotationData.CanvasInfo.CanvasFloorRect.Bottom + yCenterOffset; 
         }
 
-        ImageAnnotationData.X += x - pageX;
-        ImageAnnotationData.Y += y - pageY;
+        ImageAnnotationData.CanvasInfo.X += x - pageX;
+        ImageAnnotationData.CanvasInfo.Y += y - pageY;
 
         var previouslyMoved = isMoved;
 
@@ -197,13 +165,12 @@ public partial class ImageAnnotation : BaseComponent, IAsyncDisposable
     /// </summary>
     [Parameter] public bool Fluid { get; set; }
 
-    [Parameter] public IImageAnnotationData? ImageAnnotationData { get; set; } 
+    [Parameter] public TItem? ImageAnnotationData { get; set; } 
     [Parameter] public EventCallback<string> OnImageAnnotationSelected { get; set; }
     [Parameter] public EventCallback<string> OnImageAnnotationStartMove { get; set; }
     [Parameter] public EventCallback<string> OnImageAnnotationMoved { get; set; }
     [Parameter] public EventCallback<string> OnImageAnnotationEndMove { get; set; }
     [Parameter] public EventCallback<string> OnImageAnnotationUnselected { get; set; }
-    
 
     #endregion
 

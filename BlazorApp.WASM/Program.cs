@@ -9,9 +9,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services
     .AddSingleton(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })
-    .AddSingleton<IContentAccess,ContentAccess>()
-    .AddBlazorApp() // See BlazorApp/Config/CofigureBlazorApp.cs
-    .AddSingleton<IContentAccess, ContentAccess>();
+    .AddSingleton<IContentAccess, ContentAccess>()
+    .AddBlazorApp(); // See BlazorApp/Config/CofigureBlazorApp.cs
 ;
 
 await builder.Build().RunAsync();

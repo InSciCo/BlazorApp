@@ -48,6 +48,7 @@
         <p>@item.Value.Name @GetScenePOSX(item.Value.Id)</p>
     }
     *@
+    <img src="@imgdata" />
 
 </Div>
 
@@ -266,7 +267,7 @@
     {
         if (annotatedImage is null)
             return;
-        imgdata = await annotatedImage!.GetMergedEncodedImage(); //how is this the only place its assigned if its populating the xy of the image annotation in real time??????
+        imgdata = await annotatedImage!.GetMergedEncodedImage(); 
         imgwidth = annotatedImage.ImgElementWidth;
         imgheight = annotatedImage.ImgElementHeight;
         await InvokeAsync(StateHasChanged);

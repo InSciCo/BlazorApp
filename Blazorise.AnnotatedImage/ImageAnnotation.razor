@@ -1,6 +1,9 @@
 ﻿@namespace Blazorise.AnnotatedImage
+@typeparam TItem
 @inherits BaseComponent
-<div @onclick:preventDefault="true"
+@if (ImageAnnotationData != null)
+{
+    <div @onclick:preventDefault="true"
      draggable="false"
      @ref="ElementRef"
      id="@ElementId" 
@@ -10,11 +13,12 @@
      @onpointermove=PointerMove
      @onpointerup=PointerUp
      style="@containerPos">
-    <img draggable="false"
-         src="@ImageAnnotationData!.Source"
+        <img draggable="false"
+         src="@ImageAnnotationData?.Source"
          class="figure-img img-fluid"
           />
-</div>
+    </div>
+}
 
 
 

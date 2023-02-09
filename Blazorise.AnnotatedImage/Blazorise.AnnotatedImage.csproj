@@ -19,7 +19,7 @@
 
   <ItemGroup>
 	  <PackageReference Include="Blazorise" Version="1.1.4.1" />
-	  <PackageReference Include="SkiaSharp" Version="2.88.3" />
+	  <PackageReference Include="SkiaSharp.Views.Blazor" Version="2.88.3" />
   </ItemGroup>
 
 </Project>

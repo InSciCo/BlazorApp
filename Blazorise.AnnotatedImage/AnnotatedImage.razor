@@ -1,6 +1,8 @@
 ﻿@namespace Blazorise.AnnotatedImage
 @inherits BaseComponent
+@typeparam TItem
 @using System.Text
+
 <div class="@ClassNames"
      style="@StyleNames"
      id="@ElementId"
@@ -10,10 +12,14 @@
         @ref="backgroundImageRef" 
         src="@Source">
     </img>
-    @foreach (var item in Annotations.Values)
+
+    @if (Annotations != null)
     {
-        <ImageAnnotation 
+        @foreach (var item in Annotations.Values)
+        {
+            <ImageAnnotation 
             ElementId="@item.Id"
+            TItem="TItem"
             ImageAnnotationData="@item"
             OnImageAnnotationSelected="ImageAnnotationSelected"
             OnImageAnnotationStartMove="ImageAnnotationStartMove"
@@ -21,6 +27,7 @@
             OnImageAnnotationEndMove="ImageAnnotationEndMove"
             OnImageAnnotationUnselected="ImageAnnotationUnselected"
             />
+        }
     }
 </div>
 

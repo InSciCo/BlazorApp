@@ -38,7 +38,6 @@
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
 		<PackageReference Include="ReactiveUI.Blazor" Version="18.4.1" />
-		<PackageReference Include="SkiaSharp" Version="2.88.3" />
 		<ProjectReference Include="..\BlazorApp.ViewModels\BlazorApp.ViewModels.csproj" />
 		<ProjectReference Include="..\Blazorise.AnnotatedImage\Blazorise.AnnotatedImage.csproj" />
 		<ProjectReference Include="..\Blazorise.Camera\Blazorise.Camera.csproj" />
