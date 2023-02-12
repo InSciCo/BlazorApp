@@ -13,7 +13,7 @@ public partial class ImageAnnotation<TItem> : BaseComponent, IAsyncDisposable
     where TItem : IImageAnnotationData
 {
     #region Members
-    private string containerPos => $"top:{y}px; left:{x}px; width:{imageWidth}px; height:{imageHeight}px; {borderStyle} z-index:{ImageAnnotationData!.CanvasInfo.Order + 100}";
+    private string containerPos => $"top:{y}px; left:{x}px; width:{imageWidth}px; height:{imageHeight}px; {borderStyle} z-index:{ImageAnnotationData!.CanvasInfo!.Order + 100}";
     private string borderStyle => ImageAnnotationData!.CanvasInfo!.Selected ? "border: solid; border-color: yellow;" : "" ;
     private double pageX;
     private double pageY;

@@ -105,7 +105,7 @@ public partial class AnnotatedImage<TItem> : BaseComponent, IAsyncDisposable
     {
         if (!MultiSelect)
             foreach (var item in Annotations.Values.Where(x => x.Id != id))
-                item.CanvasInfo.Selected = false;
+                item.CanvasInfo!.Selected = false;
         await OnImageAnnotationSelected.InvokeAsync(id);
     }
     protected async Task ImageAnnotationStartMove(string id) => await OnImageAnnotationStartMove.InvokeAsync(id);
@@ -128,22 +128,6 @@ public partial class AnnotatedImage<TItem> : BaseComponent, IAsyncDisposable
     /// </summary>
     [Inject] private IVersionProvider? VersionProvider { get; set; }
     public BoundingClientRect? CanvasRect { get; private set; }
-
-    //private BoundingClientRect _canvasFloorRect = new();
-    //public BoundingClientRect? CanvasFloorRect { get
-    //    {
-    //        if (CanvasRect == null)
-    //            return _canvasFloorRect;
-
-    //        _canvasFloorRect.Left = CanvasRect.Left;
-    //        _canvasFloorRect.Right = CanvasRect.Right;
-    //        _canvasFloorRect.Bottom = CanvasRect.Bottom;
-    //        _canvasFloorRect.Top = CanvasRect.Y + CanvasRect.Height * BaseBoardRatio;
-
-    //        return _canvasFloorRect;
-    //    }
-    //    }
-
     [Parameter] public string Source { get; set; } = string.Empty;
     [Parameter] public bool MultiSelect { get; set; }
     [Parameter] public Dictionary<string,TItem> Annotations { get; set; } = new();

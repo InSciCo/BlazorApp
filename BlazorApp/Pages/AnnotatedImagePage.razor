@@ -26,6 +26,7 @@
         </Div>
         <AnnotatedImage
             @ref="@annotatedImage"
+            TItem="SceneItem"
             Annotations="@Annotations"
             OnImageAnnotationSelected="ImageAnnotationSelected"
             OnImageAnnotationStartMove="ImageAnnotationStartMove"
@@ -54,17 +55,15 @@
 
 @code {
 
-    private AnnotatedImage? annotatedImage; //Blazor assigned
+    private AnnotatedImage<SceneItem>? annotatedImage; //Blazor assigned
     private string imgdata = string.Empty;
     private double imgwidth;
     private double imgheight;
-    private Dictionary<string, IImageAnnotationData> Annotations = new();
-    private int order;
+    private Dictionary<string, SceneItem> Annotations = new();
     private string yada = string.Empty;
     private ISceneGraph? SceneGraph;
     private List<SceneItem>? SceneItemStore;
     private string SceneItemSelectedId = string.Empty;
-    private int count = 0;
 
     [Inject] IContentAccess? ContentAccess { get; set; }
 
@@ -74,20 +73,6 @@
             await ReadSample();
         await base.OnAfterRenderAsync(firstRender);
     }
-
-    //private double GetScenePOSX(string id) {
-
-    //    Console.WriteLine($"id={id}");
-
-    //    if (SceneGraph?.SceneItems?.TryGetValue(id, out ISceneItem? SceneItem) ?? false)
-    //    {
-    //        return SceneItem.ScenePos.X;
-    //    }
-    //    else
-    //    {
-    //        throw new Exception($"Can't find key 'id' in SceneGraph.SceneItems, or SceneGraph was null");
-    //    }
-    //}
 
     private async Task ReadSample()
     {
@@ -119,22 +104,28 @@
             var id = Guid.NewGuid().ToString();
             SceneItemSelectedId = id;
 
+            CanvasInfo canvasInfo = new()
+                {
+                    X = imageWidth / 2,
+                    Y = imageWidth / 2,
+                    Order = 0,
+                    Height = 48,
+                    Width = 48,
+                    CanvasFloorRect = annotatedImage.CanvasRect!
+                };
+
             var sceneItem = new SceneItem()
                 {
                     Id = id,
                     Name = item.Name,
-                    Source = item.Source,
-                    X = imageWidth / 2,
-                    Y = imageHeight / 2,
-                    Order = 0,
-                    Height = 48,
-                    Width = 48,
-                    CanvasFloorRect = annotatedImage.CanvasRect
-        };
-            sceneItem.Scale = CalculateScale(sceneItem);
+                    Source = item.Source, 
+                    CanvasInfo = canvasInfo
+                };
+
+            sceneItem.CanvasInfo.Scale = CalculateScale(sceneItem);
             sceneItem.ScenePos.X = 10.0;
             SceneGraph!.SceneItems.Add(sceneItem.Id, sceneItem); //warn - id by val if from local scope => breaks trygetval object string compare
-            Annotations.Add(sceneItem.Id, (IImageAnnotationData) sceneItem); //warn - id by val if from local scope => breaks trygetval object string compare
+            Annotations.Add(sceneItem.Id,  sceneItem); //warn - id by val if from local scope => breaks trygetval object string compare
         }
         catch (Exception e)
         {
@@ -149,7 +140,7 @@
         if (annotatedImage is null)
             return Task.CompletedTask;
 
-        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+        if (!Annotations.TryGetValue(id, out SceneItem? imageAnnotation))
             return Task.CompletedTask;
 
         return Task.CompletedTask;
@@ -160,7 +151,7 @@
         if (annotatedImage is null)
             return Task.CompletedTask;
 
-        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+        if (!Annotations.TryGetValue(id, out SceneItem? imageAnnotation))
             return Task.CompletedTask;
 
         return Task.CompletedTask;
@@ -171,11 +162,11 @@
         if (annotatedImage is null)
             return Task.CompletedTask;
 
-        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+        if (!Annotations.TryGetValue(id, out SceneItem? imageAnnotation))
             throw new Exception();
         else
         {
-            Annotations[id].CanvasFloorRect.X = 0.0;
+            Annotations[id].CanvasInfo!.CanvasFloorRect.X = 0.0;
             return Task.CompletedTask;
         }
     }
@@ -185,11 +176,11 @@
         if (annotatedImage is null)
             return;
 
-        if (SceneGraph?.SceneItems?.TryGetValue(id, out ISceneItem sceneItem) ?? false)
+        if (SceneGraph?.SceneItems?.TryGetValue(id, out ISceneItem? sceneItem) ?? false)
         {
             //SceneGraphExtensions.SceneToAnnotation(SceneGraph, id, annotatedImage.ImgElementHeight, annotatedImage.ImgElementWidth);
-            SceneGraph.AnnotationToScene(id, annotatedImage);
-            sceneItem.Scale = CalculateScale(sceneItem);
+            //SceneGraph.AnnotationToScene(id, annotatedImage);
+            sceneItem.CanvasInfo!.Scale = CalculateScale(sceneItem);
             if (SetOrder())
                 await InvokeAsync(StateHasChanged);
             return;
@@ -205,7 +196,7 @@
         if (annotatedImage is null)
             return;
 
-        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+        if (!Annotations.TryGetValue(id, out SceneItem? imageAnnotation))
             return;
 
         if (SetOrder())
@@ -218,7 +209,7 @@
         if (annotatedImage is null)
             return;
 
-        if (!Annotations.TryGetValue(id, out IImageAnnotationData? imageAnnotation))
+        if (!Annotations.TryGetValue(id, out SceneItem? imageAnnotation))
             return;
 
         if (SetOrder())
@@ -231,19 +222,19 @@
         if (annotatedImage is null)
             return 0.5;
 
-        return 0.25 + (0.75 * annotation.Y / (annotatedImage.CanvasRect!.Bottom - annotatedImage.CanvasRect!.Top));
+        return 0.25 + (0.75 * annotation.CanvasInfo!.Y / (annotatedImage.CanvasRect!.Bottom - annotatedImage.CanvasRect!.Top));
     }
     private bool SetOrder()
     {
-        var items = Annotations.Values.OrderBy(x => x.Y).ToList(); 
+        var items = Annotations.Values.OrderBy(x => x.CanvasInfo!.Y).ToList(); 
         int order = 0;
         var changed = false;
         foreach (var item in items)
         {
-            if(item.Order != order)
+            if(item.CanvasInfo!.Order != order)
             {
-                Console.WriteLine($"order:{item.Order} {order}");
-                item.Order = order;
+                Console.WriteLine($"order:{item.CanvasInfo.Order} {order}");
+                item.CanvasInfo.Order = order;
                 changed = true;
             }
             order++;

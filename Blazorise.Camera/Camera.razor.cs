@@ -18,13 +18,13 @@ public partial class Camera : BaseComponent, IAsyncDisposable
 	protected override Task OnInitializedAsync()
 	{
 		if (JSModule == null)
-			JSModule = new JSCameraModule(JSRuntime, VersionProvider);
+			JSModule = new JSCameraModule(JSRuntime!, VersionProvider!);
 		return base.OnInitializedAsync();
 	}
 	/// <inheritdoc />
 	protected override async Task OnFirstAfterRenderAsync()
 	{
-		await JSModule.Initialize(ElementRef, _canvasRef, MirrorImage, "environment");
+		await JSModule!.Initialize(ElementRef, _canvasRef, MirrorImage, "environment");
 	}
 
 	/// <inheritdoc/>
@@ -36,7 +36,7 @@ public partial class Camera : BaseComponent, IAsyncDisposable
 	}
 	public async ValueTask<string> TakePicture()
 	{
-		return await JSModule.TakePicture();
+		return await JSModule!.TakePicture();
 	}
 
 	#endregion
@@ -45,22 +45,22 @@ public partial class Camera : BaseComponent, IAsyncDisposable
 	/// <summary>
 	/// Gets or sets the JSCameraModule instance.
 	/// </summary>
-	protected JSCameraModule JSModule { get; private set; }
+	protected JSCameraModule? JSModule { get; private set; }
 
 	/// <summary>
 	/// Gets or sets the JS runtime.
 	/// </summary>
-	[Inject] private IJSRuntime JSRuntime { get; set; }
+	[Inject] private IJSRuntime? JSRuntime { get; set; }
 
 	/// <summary>
 	/// Gets or sets the version provider.
 	/// </summary>
-	[Inject] private IVersionProvider VersionProvider { get; set; }
+	[Inject] private IVersionProvider? VersionProvider { get; set; }
 
 	/// <summary>
 	/// Image alt text.
 	/// </summary>
-	[Parameter] public string Alt { get; set; }
+	[Parameter] public string Alt { get; set; } = string.Empty;
 
 	[Parameter] public bool MirrorImage { get; set; }
 
