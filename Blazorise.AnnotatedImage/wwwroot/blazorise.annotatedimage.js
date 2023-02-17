@@ -28,7 +28,6 @@ export function getBoundingClientRect(elm) {
 export function getBase64Image(img) {
     // Create an empty canvas element
     var canvas = document.createElement("canvas");
-    //var canvas = new OffscreenCanvas(img.width, img.height);
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
 
@@ -36,8 +35,8 @@ export function getBase64Image(img) {
     var ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0);
 
-    // Using default image/png becuase Safari doesn't suppor tthe type argument'
-    var dataURL = canvas.toDataURL(); 
+    // Using default image/png becuase Safari doesn't support the type argument'
+    var dataURL = canvas.toDataURL();
     return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
 }
 

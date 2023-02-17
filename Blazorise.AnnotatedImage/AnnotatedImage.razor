@@ -8,10 +8,21 @@
      id="@ElementId"
      @ref="@ElementRef"
      @attributes="@Attributes">
+     @if(ImageWidth != 0 || ImageHeight != 0)
+     {
     <img 
+        height="@ImageHeight"
+        width="@ImageWidth"
         @ref="backgroundImageRef" 
         src="@Source">
-    </img>
+       
+    } else
+    {
+        <img 
+         @ref="backgroundImageRef"
+         src="@Source">
+       
+    }
 
     @if (Annotations != null)
     {

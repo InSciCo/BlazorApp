@@ -57,7 +57,9 @@ public partial class AnnotatedImage<TItem> : BaseComponent, IAsyncDisposable
     public async Task<string> GetMergedEncodedImage()
     {
         var backgroundImage = await GetImage(backgroundImageRef);
+        // Width and Height are the native size of the image (not rendered size)
         var info = new SKImageInfo(backgroundImage.Width, backgroundImage.Height);
+        var canvasScale = ImgElementWidth / backgroundImage.Width;
         using (var surface = SKSurface.Create(info))
         {
             var canvas = surface.Canvas;
@@ -76,12 +78,12 @@ public partial class AnnotatedImage<TItem> : BaseComponent, IAsyncDisposable
 
                 // Scale the annotation and draw it into the canvas using skia ScalePixels 
                 // Note: This is the primary reason we use the skia lib. PNG images are scaled without 
-                // losing transparency. There are js solutions to do this scaling, but they very slow
+                // losing transparency. There are js solutions to do this scaling, but they are very slow
                 // in comparision to using skia.
-                var width = annotation.CanvasInfo.Width * annotation.CanvasInfo.Scale;
-                var height = annotation.CanvasInfo.Height * annotation.CanvasInfo.Scale;
-                var x = (float)(annotation.CanvasInfo.X - (width / 2));
-                var y = (float)(annotation.CanvasInfo.Y - (height / 2));
+                var width = annotation.CanvasInfo.Width * annotation.CanvasInfo.Scale / canvasScale;
+                var height = annotation.CanvasInfo.Height * annotation.CanvasInfo.Scale / canvasScale;
+                var x = (float)(annotation.CanvasInfo.X / canvasScale - (width / 2));
+                var y = (float)(annotation.CanvasInfo.Y / canvasScale - (height / 2));
                 var x2 = (float)(x + width);
                 var y2 = (float)(y + height);
                 var sourceBitmap = SKBitmap.FromImage(annotationImage);
@@ -137,6 +139,8 @@ public partial class AnnotatedImage<TItem> : BaseComponent, IAsyncDisposable
     [Parameter] public EventCallback<string> OnImageAnnotationEndMove { get; set; }
     [Parameter] public EventCallback<string> OnImageAnnotationUnselected { get; set; }
     [Parameter] public double BaseBoardRatio { get; set; } = 0.5;
+    [Parameter] public double ImageWidth { get; set; }
+    [Parameter] public double ImageHeight { get; set; } 
 
     /// <summary>
     /// Width of original image

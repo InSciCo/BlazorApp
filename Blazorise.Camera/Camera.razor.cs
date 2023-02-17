@@ -64,6 +64,5 @@ public partial class Camera : BaseComponent, IAsyncDisposable
 
 	[Parameter] public bool MirrorImage { get; set; }
 
-
 	#endregion
 }
