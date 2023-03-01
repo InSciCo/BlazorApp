@@ -98,13 +98,10 @@ public partial class ImageAnnotation<TItem> : BaseComponent, IAsyncDisposable
         if (!pointerDown || ImageAnnotationData?.CanvasInfo is null)
             return;
 
-        if(ImageAnnotationData.CanvasInfo.CanvasFloorRect != null)
-        {
-            if(x + xCenterOffset < ImageAnnotationData.CanvasInfo.CanvasFloorRect.Left) x= ImageAnnotationData.CanvasInfo.CanvasFloorRect.Left + xCenterOffset;
-            if(x + xCenterOffset > ImageAnnotationData.CanvasInfo.CanvasFloorRect.Right) x= ImageAnnotationData.CanvasInfo.CanvasFloorRect.Right + xCenterOffset;     
-            if(y + yCenterOffset < ImageAnnotationData.CanvasInfo.CanvasFloorRect.Top) y= ImageAnnotationData.CanvasInfo.CanvasFloorRect.Top + yCenterOffset;
-            if(y + yCenterOffset > ImageAnnotationData.CanvasInfo.CanvasFloorRect.Bottom) y= ImageAnnotationData.CanvasInfo.CanvasFloorRect.Bottom + yCenterOffset; 
-        }
+        if(x + xCenterOffset < AnnotatedImageClientRect.Left) x= AnnotatedImageClientRect.Left + xCenterOffset;
+        if(x + xCenterOffset > AnnotatedImageClientRect.Right) x= AnnotatedImageClientRect.Right + xCenterOffset;     
+        if(y + yCenterOffset < AnnotatedImageClientRect.Top) y= AnnotatedImageClientRect.Top + yCenterOffset;
+        if(y + yCenterOffset > AnnotatedImageClientRect.Bottom) y= AnnotatedImageClientRect.Bottom + yCenterOffset; 
 
         ImageAnnotationData.CanvasInfo.X += x - pageX;
         ImageAnnotationData.CanvasInfo.Y += y - pageY;
@@ -171,6 +168,7 @@ public partial class ImageAnnotation<TItem> : BaseComponent, IAsyncDisposable
     [Parameter] public EventCallback<string> OnImageAnnotationMoved { get; set; }
     [Parameter] public EventCallback<string> OnImageAnnotationEndMove { get; set; }
     [Parameter] public EventCallback<string> OnImageAnnotationUnselected { get; set; }
+    [Parameter] public BoundingClientRect AnnotatedImageClientRect { get; set; } = new();
 
     #endregion
 

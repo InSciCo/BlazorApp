@@ -3,7 +3,7 @@
 
 namespace Blazorise.AnnotatedImage;
 
-public class BoundingClientRect
+public class BoundingClientRect : IBoundingClientRect
 {
     public double X { get; set; }
     public double Y { get; set; }

@@ -70,6 +70,9 @@ public partial class AnnotatedImage<TItem> : BaseComponent, IAsyncDisposable
                 if (annotation.CanvasInfo == null)
                     continue;
 
+                var debugImg = await JSModule!.GetImageAnnotationDataURLById(
+                                annotation.Id!);
+
                 var annotationImage =
                     SKImage.FromEncodedData(
                         Convert.FromBase64String(

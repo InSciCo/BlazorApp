@@ -50,7 +50,6 @@ public class JSAnnotatedImageModule : BaseJSModule
 
     /// <inheritdoc/>
     public override string ModuleFileName => $"./_content/Blazorise.AnnotatedImage/blazorise.annotatedimage.js?v={VersionProvider.Version}";
-    //public override string ModuleFileName => $"./_content/Blazorise.AnnotatedImage/blazorise.imageannotations.js";
 
     #endregion
 

@@ -12,7 +12,6 @@ public interface ICanvasInfo
     double X { get; set; }
     double Y { get; set; }
     bool Selected { get; set; }
-    BoundingClientRect CanvasFloorRect { get; set; }
 }
 
 public interface IImageAnnotationData
