@@ -3,9 +3,6 @@
 
 namespace Blazorise.AnnotatedImage;
 
-
-
-
 public class CanvasInfo  : ICanvasInfo
 {
     public double Order { get; set; }
