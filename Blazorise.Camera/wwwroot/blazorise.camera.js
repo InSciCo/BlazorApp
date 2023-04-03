@@ -10,10 +10,12 @@ var streaming = false;
 // will be set by the initialize() function.
 var video = null;
 var canvas = null;
+var width = 0;
+var height = 0;
 
 export function initialize(videoRef, canvasRef, mirrorImage, facingMode) {
-    video = videoRef;
     canvas = canvasRef;
+    video = videoRef;
     facingMode = (facingMode == null || facingMode == "") ? "environment" : facingMode;
     //mirror = mirrorImage;
 
@@ -45,6 +47,10 @@ export function initialize(videoRef, canvasRef, mirrorImage, facingMode) {
     }, false);
 }
 
+export async function getWidthAndHeight() {
+    return [ width, height ];
+}
+
 export function takepicture() {
     var context = canvas.getContext('2d');
     canvas.width = video.videoWidth;
@@ -56,7 +62,10 @@ export function takepicture() {
     else 
         canvas.height = video.videoHeight;
 
-    context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+    width = video.videoWidth;
+    height = canvas.height;
+
+    context.drawImage(video, 0, 0, video.videoWidth,  canvas.height);
     var data = canvas.toDataURL('image/png');
     return data;
 }

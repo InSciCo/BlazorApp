@@ -43,6 +43,12 @@ public class JSCameraModule : BaseJSModule
 	public virtual ValueTask<string> TakePicture()
 		=> InvokeSafeAsync<string>("takepicture");
 
+	public virtual async ValueTask<(double, double)> GetWidthAndHeight()
+	{
+		var resultArray = await InvokeAsync<double[]>("getWidthAndHeight");
+		return (resultArray[0], resultArray[1]);
+	}
+
 	#endregion
 
 	#region Properties

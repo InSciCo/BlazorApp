@@ -39,6 +39,11 @@ public partial class Camera : BaseComponent, IAsyncDisposable
 		return await JSModule!.TakePicture();
 	}
 
+
+	public async ValueTask<(double,double)> GetWidthAndHeight()
+	{
+		return await JSModule!.GetWidthAndHeight();
+	}
 	#endregion
 
 	#region Properties 
