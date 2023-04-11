@@ -29,12 +29,11 @@ public class JSCameraModule : BaseJSModule
 	/// Initialize Camera with specified options
 	/// </summary>
 	/// <param name="videoRef">video element reference</param>
-	/// <param name="canvasRef">canvas element reference</param>
 	/// <param name="mirrorImage"></param>
 	/// <param name="facingMode">Must be one of: "user" | "environment"</param>
 	/// <returns></returns>
-	public virtual ValueTask Initialize(ElementReference videoRef, ElementReference canvasRef, bool mirrorImage, string facingMode)
-		=> InvokeSafeVoidAsync("initialize", videoRef, canvasRef, mirrorImage, facingMode);
+	public virtual ValueTask Initialize(ElementReference videoRef, bool mirrorImage, string facingMode)
+		=> InvokeSafeVoidAsync("initialize", videoRef, mirrorImage, facingMode);
 
 	/// <summary>
 	/// Take picture and return base64 encoded string.
@@ -43,9 +42,9 @@ public class JSCameraModule : BaseJSModule
 	public virtual ValueTask<string> TakePicture()
 		=> InvokeSafeAsync<string>("takepicture");
 
-	public virtual async ValueTask<(double, double)> GetWidthAndHeight()
+	public virtual async ValueTask<(int, int)> GetWidthAndHeight()
 	{
-		var resultArray = await InvokeAsync<double[]>("getWidthAndHeight");
+		var resultArray = await InvokeAsync<int[]>("getWidthAndHeight");
 		return (resultArray[0], resultArray[1]);
 	}
 

@@ -5,8 +5,6 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<DebugSymbols>true</DebugSymbols>
-		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -10,8 +10,6 @@ namespace Blazorise.Camera;
 public partial class Camera : BaseComponent, IAsyncDisposable
 {
 
-	private ElementReference  _canvasRef;
-
 	#region Methods
 
 	/// <inheritdoc/>
@@ -24,7 +22,7 @@ public partial class Camera : BaseComponent, IAsyncDisposable
 	/// <inheritdoc />
 	protected override async Task OnFirstAfterRenderAsync()
 	{
-		await JSModule!.Initialize(ElementRef, _canvasRef, MirrorImage, "environment");
+		await JSModule!.Initialize(ElementRef, MirrorImage, "environment");
 	}
 
 	/// <inheritdoc/>
@@ -40,7 +38,7 @@ public partial class Camera : BaseComponent, IAsyncDisposable
 	}
 
 
-	public async ValueTask<(double,double)> GetWidthAndHeight()
+	public async ValueTask<(int,int)> GetWidthAndHeight()
 	{
 		return await JSModule!.GetWidthAndHeight();
 	}

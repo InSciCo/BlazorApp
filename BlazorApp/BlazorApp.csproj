@@ -14,22 +14,22 @@
 	<ItemGroup>
 		<PackageReference Include="Blazor.Extensions.Canvas" Version="1.1.1" />
 		<PackageReference Include="Blazor3D" Version="0.1.24" />
-		<PackageReference Include="Blazorise.Animate" Version="1.1.4.1" />
-		<PackageReference Include="Blazorise.Bootstrap5" Version="1.1.4.1" />
-		<PackageReference Include="Blazorise.Components" Version="1.1.4.1" />
-		<PackageReference Include="Blazorise.DataGrid" Version="1.1.4.1" />
-		<PackageReference Include="Blazorise.FluentValidation" Version="1.1.4.1" />
-		<PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.1.4.1" />
-		<PackageReference Include="Blazorise.LoadingIndicator" Version="1.1.4.1" />
-		<PackageReference Include="Blazorise.QRCode" Version="1.1.4.1" />
-		<PackageReference Include="Blazorise.RichTextEdit" Version="1.1.4.1" />
-		<PackageReference Include="Blazorise.TreeView" Version="1.1.4.1" />
-		<PackageReference Include="BlazorPro.BlazorSize" Version="6.1.2" />
+		<PackageReference Include="Blazorise.Animate" Version="1.2.2" />
+		<PackageReference Include="Blazorise.Bootstrap5" Version="1.2.2" />
+		<PackageReference Include="Blazorise.Components" Version="1.2.2" />
+		<PackageReference Include="Blazorise.DataGrid" Version="1.2.2" />
+		<PackageReference Include="Blazorise.FluentValidation" Version="1.2.2" />
+		<PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.2.2" />
+		<PackageReference Include="Blazorise.LoadingIndicator" Version="1.2.2" />
+		<PackageReference Include="Blazorise.QRCode" Version="1.2.2" />
+		<PackageReference Include="Blazorise.RichTextEdit" Version="1.2.2" />
+		<PackageReference Include="Blazorise.TreeView" Version="1.2.2" />
+		<PackageReference Include="BlazorPro.BlazorSize" Version="6.2.0" />
 		<PackageReference Include="DeepCloner" Version="0.10.4" />
-		<PackageReference Include="KristofferStrube.Blazor.FileSystemAccess" Version="2.1.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-		<PackageReference Include="ReactiveUI.Blazor" Version="18.4.1" />
+		<PackageReference Include="KristofferStrube.Blazor.FileSystemAccess" Version="3.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.4" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="ReactiveUI.Blazor" Version="18.4.26" />
 		<ProjectReference Include="..\BlazorApp.ViewModels\BlazorApp.ViewModels.csproj" />
 		<ProjectReference Include="..\Blazorise.AnnotatedImage\Blazorise.AnnotatedImage.csproj" />
 		<ProjectReference Include="..\Blazorise.Camera\Blazorise.Camera.csproj" />

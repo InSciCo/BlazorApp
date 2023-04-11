@@ -9,12 +9,8 @@ var streaming = false;
 // The various HTML elements we need to configure or control. These
 // will be set by the initialize() function.
 var video = null;
-var canvas = null;
-var width = 0;
-var height = 0;
 
-export function initialize(videoRef, canvasRef, mirrorImage, facingMode) {
-    canvas = canvasRef;
+export function initialize(videoRef, mirrorImage, facingMode) {
     video = videoRef;
     facingMode = (facingMode == null || facingMode == "") ? "environment" : facingMode;
     //mirror = mirrorImage;
@@ -47,26 +43,25 @@ export function initialize(videoRef, canvasRef, mirrorImage, facingMode) {
     }, false);
 }
 
+
 export async function getWidthAndHeight() {
-    return [ width, height ];
+    const width = video.videoWidth;
+    const height = isNaN(video.videoHeight) ? width / (4.0 / 3.0) : video.videoHeight;
+    return [ parseInt(width), parseInt(height) ];
 }
 
 export function takepicture() {
-    var context = canvas.getContext('2d');
-    canvas.width = video.videoWidth;
-
     // Firefox currently has a bug where the height can't be read from
     // the video, so we will make assumptions if this happens.
-    if (isNaN(video.videoHeight)) 
-        canvas.height = video.videoWidth / (4/3 );
-    else 
-        canvas.height = video.videoHeight;
-
-    width = video.videoWidth;
-    height = canvas.height;
-
-    context.drawImage(video, 0, 0, video.videoWidth,  canvas.height);
+    const width = video.videoWidth;
+    const height = isNaN(video.videoHeight) ? width / (4.0 / 3.0) : video.videoHeight;
+    const canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = height;
+    context.drawImage(video, 0, 0, canvas.width,  canvas.height);
     var data = canvas.toDataURL('image/png');
+    canvas.remove();
     return data;
 }
 
