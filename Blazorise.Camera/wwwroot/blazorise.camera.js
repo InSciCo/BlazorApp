@@ -9,9 +9,10 @@ var streaming = false;
 // The various HTML elements we need to configure or control. These
 // will be set by the initialize() function.
 var video = null;
-
-export function initialize(videoRef, mirrorImage, facingMode) {
+var moduleInstance = null;
+export function initialize(videoRef, mirrorImage, facingMode, moduleInstanceRef) {
     video = videoRef;
+    moduleInstance = moduleInstanceRef;
     facingMode = (facingMode == null || facingMode == "") ? "environment" : facingMode;
     //mirror = mirrorImage;
 
@@ -31,6 +32,7 @@ export function initialize(videoRef, mirrorImage, facingMode) {
                 video.style.webkitTransform = "scaleX(-1)";
                 video.style.transform = "scaleX(-1)";
             }
+            
         })
         .catch(function (err) {
             console.log("An error occurred: " + err);
@@ -40,11 +42,13 @@ export function initialize(videoRef, mirrorImage, facingMode) {
         if (!streaming) {
             streaming = true;
         }
+        moduleInstance.invokeMethodAsync("OnCameraInitialized");
     }, false);
 }
 
-
 export async function getWidthAndHeight() {
+    if (video == null || isNaN(video.videoWidth))
+        return [0, 0];
     const width = video.videoWidth;
     const height = isNaN(video.videoHeight) ? width / (4.0 / 3.0) : video.videoHeight;
     return [ parseInt(width), parseInt(height) ];

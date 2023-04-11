@@ -12,15 +12,18 @@ namespace Blazorise.Camera;
 /// </summary>
 public class JSCameraModule : BaseJSModule
 {
-	#region Constructors
-	/// <summary>
-	/// Default module constructor.
-	/// </summary>
-	/// <param name="jsRuntime">JavaScript runtime instance.</param>
-	/// <param name="versionProvider">Version provider.</param>
-	public JSCameraModule(IJSRuntime jsRuntime, IVersionProvider versionProvider) : base(jsRuntime, versionProvider)
+    private DotNetObjectReference<JSCameraModule> moduleInstance;
+
+    #region Constructors
+    /// <summary>
+    /// Default module constructor.
+    /// </summary>
+    /// <param name="jsRuntime">JavaScript runtime instance.</param>
+    /// <param name="versionProvider">Version provider.</param>
+    public JSCameraModule(IJSRuntime jsRuntime, IVersionProvider versionProvider) : base(jsRuntime, versionProvider)
 	{
-	}
+		moduleInstance = DotNetObjectReference.Create(this);
+    }
 	#endregion
 
 	#region Methods
@@ -33,7 +36,7 @@ public class JSCameraModule : BaseJSModule
 	/// <param name="facingMode">Must be one of: "user" | "environment"</param>
 	/// <returns></returns>
 	public virtual ValueTask Initialize(ElementReference videoRef, bool mirrorImage, string facingMode)
-		=> InvokeSafeVoidAsync("initialize", videoRef, mirrorImage, facingMode);
+		=> InvokeSafeVoidAsync("initialize", videoRef, mirrorImage, facingMode, moduleInstance);
 
 	/// <summary>
 	/// Take picture and return base64 encoded string.
@@ -47,6 +50,15 @@ public class JSCameraModule : BaseJSModule
 		var resultArray = await InvokeAsync<int[]>("getWidthAndHeight");
 		return (resultArray[0], resultArray[1]);
 	}
+
+	[JSInvokable]
+	public void OnCameraInitialized()
+	{
+		CameraInitializedHandlerEvent?.Invoke();
+
+    }
+	public delegate void CameraInitializedHandler();
+	public event CameraInitializedHandler CameraInitializedHandlerEvent;
 
 	#endregion
 

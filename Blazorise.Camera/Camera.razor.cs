@@ -22,14 +22,24 @@ public partial class Camera : BaseComponent, IAsyncDisposable
 	/// <inheritdoc />
 	protected override async Task OnFirstAfterRenderAsync()
 	{
+
 		await JSModule!.Initialize(ElementRef, MirrorImage, "environment");
+		JSModule.CameraInitializedHandlerEvent += JSModuleOnInitialized;
+	}
+
+	private void JSModuleOnInitialized()
+	{
+		CameraInitialized.InvokeAsync(this);
 	}
 
 	/// <inheritdoc/>
 	protected override async ValueTask DisposeAsync(bool disposing)
 	{
 		if (disposing && Rendered)
-			await JSModule.SafeDisposeAsync();
+		{
+            JSModule!.CameraInitializedHandlerEvent -= JSModuleOnInitialized;
+            await JSModule.SafeDisposeAsync();
+        }
 		await base.DisposeAsync(disposing);
 	}
 	public async ValueTask<string> TakePicture()
@@ -38,10 +48,11 @@ public partial class Camera : BaseComponent, IAsyncDisposable
 	}
 
 
-	public async ValueTask<(int,int)> GetWidthAndHeight()
+	public async ValueTask<(int Width,int Height)> GetWidthAndHeight()
 	{
 		return await JSModule!.GetWidthAndHeight();
 	}
+
 	#endregion
 
 	#region Properties 
@@ -66,6 +77,7 @@ public partial class Camera : BaseComponent, IAsyncDisposable
 	[Parameter] public string Alt { get; set; } = string.Empty;
 
 	[Parameter] public bool MirrorImage { get; set; }
+	[Parameter] public EventCallback CameraInitialized { get; set; }	
 
 	#endregion
 }
