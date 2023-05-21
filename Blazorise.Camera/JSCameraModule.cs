@@ -35,8 +35,8 @@ public class JSCameraModule : BaseJSModule
 	/// <param name="mirrorImage"></param>
 	/// <param name="facingMode">Must be one of: "user" | "environment"</param>
 	/// <returns></returns>
-	public virtual ValueTask Initialize(ElementReference videoRef, bool mirrorImage, string facingMode)
-		=> InvokeSafeVoidAsync("initialize", videoRef, mirrorImage, facingMode, moduleInstance);
+	public virtual ValueTask<bool> Initialize(ElementReference videoRef, bool mirrorImage, string facingMode)
+		=> InvokeSafeAsync<bool>("initialize", videoRef, mirrorImage, facingMode, moduleInstance);
 
 	/// <summary>
 	/// Take picture and return base64 encoded string.
@@ -60,12 +60,33 @@ public class JSCameraModule : BaseJSModule
 	public delegate void CameraInitializedHandler();
 	public event CameraInitializedHandler CameraInitializedHandlerEvent;
 
-	#endregion
+    [JSInvokable]
+    public void OnCameraUnavailable()
+    {
+        CameraUnavailableHandlerEvent?.Invoke();
+    }
+    public delegate void CameraUnavailabledHandler();
+    public event CameraUnavailabledHandler CameraUnavailableHandlerEvent;
 
-	#region Properties
+    protected override async ValueTask DisposeAsync(bool disposing)
+	{
+		if(disposing)
+		{
+			try
+			{
+				await InvokeVoidAsync("releaseCamera");
+			} catch
+			{
+				; // ingore error
+			}
+		}
+	}
+    #endregion
 
-	/// <inheritdoc/>
-	public override string ModuleFileName => $"./_content/Blazorise.Camera/blazorise.camera.js?v={VersionProvider.Version}";
+    #region Properties
+
+    /// <inheritdoc/>
+    public override string ModuleFileName => $"./_content/Blazorise.Camera/blazorise.camera.js?v={VersionProvider.Version}";
 
 	#endregion
 }

@@ -15,38 +15,49 @@ public partial class Camera : BaseComponent, IAsyncDisposable
 	/// <inheritdoc/>
 	protected override Task OnInitializedAsync()
 	{
-		if (JSModule == null)
-			JSModule = new JSCameraModule(JSRuntime!, VersionProvider!);
+		JSModule ??= new JSCameraModule(JSRuntime!, VersionProvider!);
 		return base.OnInitializedAsync();
-	}
+    }
 	/// <inheritdoc />
 	protected override async Task OnFirstAfterRenderAsync()
 	{
-
-		await JSModule!.Initialize(ElementRef, MirrorImage, "environment");
-		JSModule.CameraInitializedHandlerEvent += JSModuleOnInitialized;
+	    isCameraAvailable =	await JSModule!.Initialize(ElementRef, MirrorImage, "environment");
+        // isCameraAvailable = await JSModule!.IsCameraAvailable();
+        JSModule.CameraInitializedHandlerEvent += JSModuleOnInitialized;
+		JSModule.CameraUnavailableHandlerEvent += JSModuleCameraUnavailiable;
 	}
+
+	protected override async Task OnAfterRenderAsync(bool isFirstRender)
+	{
+		await base.OnAfterRenderAsync(isFirstRender);
+    }
 
 	private void JSModuleOnInitialized()
 	{
 		CameraInitialized.InvokeAsync(this);
+       
+    }
+	private void JSModuleCameraUnavailiable()
+	{
+		isCameraAvailable = false;
+		InvokeAsync(StateHasChanged);
 	}
-
 	/// <inheritdoc/>
 	protected override async ValueTask DisposeAsync(bool disposing)
 	{
 		if (disposing && Rendered)
 		{
             JSModule!.CameraInitializedHandlerEvent -= JSModuleOnInitialized;
+			JSModule!.CameraUnavailableHandlerEvent -= JSModuleCameraUnavailiable;	
             await JSModule.SafeDisposeAsync();
         }
 		await base.DisposeAsync(disposing);
+		
 	}
 	public async ValueTask<string> TakePicture()
 	{
 		return await JSModule!.TakePicture();
 	}
-
 
 	public async ValueTask<(int Width,int Height)> GetWidthAndHeight()
 	{
@@ -54,6 +65,8 @@ public partial class Camera : BaseComponent, IAsyncDisposable
 	}
 
 	#endregion
+
+	private bool isCameraAvailable = true;
 
 	#region Properties 
 	/// <summary>

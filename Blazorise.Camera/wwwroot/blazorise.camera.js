@@ -11,6 +11,7 @@ var streaming = false;
 var video = null;
 var moduleInstance = null;
 export function initialize(videoRef, mirrorImage, facingMode, moduleInstanceRef) {
+    let isAvailable = true;
     video = videoRef;
     moduleInstance = moduleInstanceRef;
     facingMode = (facingMode == null || facingMode == "") ? "environment" : facingMode;
@@ -32,10 +33,11 @@ export function initialize(videoRef, mirrorImage, facingMode, moduleInstanceRef)
                 video.style.webkitTransform = "scaleX(-1)";
                 video.style.transform = "scaleX(-1)";
             }
-            
         })
         .catch(function (err) {
             console.log("An error occurred: " + err);
+            isAvailable = false;
+            moduleInstance.invokeMethodAsync("OnCameraUnavailable");
         });
 
     video.addEventListener('canplay', function (ev) {
@@ -44,8 +46,14 @@ export function initialize(videoRef, mirrorImage, facingMode, moduleInstanceRef)
         }
         moduleInstance.invokeMethodAsync("OnCameraInitialized");
     }, false);
+    return isAvailable;
 }
-
+export function releaseCamera() {
+    const stream = video.srcObject;
+    const tracks = stream.getTracks();
+    tracks.forEach(track => track.stop());
+    video.srcObject = null;
+}
 export async function getWidthAndHeight() {
     if (video == null || isNaN(video.videoWidth))
         return [0, 0];
@@ -53,7 +61,6 @@ export async function getWidthAndHeight() {
     const height = isNaN(video.videoHeight) ? width / (4.0 / 3.0) : video.videoHeight;
     return [ parseInt(width), parseInt(height) ];
 }
-
 export function takepicture() {
     // Firefox currently has a bug where the height can't be read from
     // the video, so we will make assumptions if this happens.
