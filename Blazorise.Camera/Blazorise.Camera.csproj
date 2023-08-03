@@ -12,7 +12,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Blazorise" Version="1.2.2" />
+		<PackageReference Include="Blazorise" Version="1.2.3" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
 	</ItemGroup>
 
 </Project>
